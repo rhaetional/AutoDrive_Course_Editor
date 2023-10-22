@@ -33,11 +33,17 @@ public final class FlipVerticalButton extends AlignBaseButton {
 
     @Override
     protected void adjustNodesTo(MapNode toNode) {
+
+        //local debug flag
+        boolean bDebugFlipVertical = false;
+
         LOG.info("Vertically Flipping {} nodes at world Z coordinate {}",multiSelectList.size(), toNode.z);
         changeManager.addChangeable( new AlignmentChanger(multiSelectList, 0, 0, toNode.z));
-        for (MapNode node : multiSelectList) {
-            LOG.info("pre Flip Vertical x: {} y: {} z: {}",node.x, node.y,node.z);
-        }
+
+        // Debug: Output nodes before change
+        if (bDebugFlipVertical)
+            for (MapNode node : multiSelectList)
+                LOG.info("pre Flip Vertical x: {} y: {} z: {}", node.x, node.y, node.z);
 
         // Sort List by Z coordinate
         multiSelectList.sort(Comparator.comparingDouble(value -> value.z));
@@ -45,14 +51,15 @@ public final class FlipVerticalButton extends AlignBaseButton {
         // calculate midpoint
         double midpoint = (multiSelectList.getLast().z + multiSelectList.getFirst().z)/2;
 
-        LOG.info("Flip Vertical midpoint: {} ", midpoint);
+        if (bDebugFlipVertical) LOG.info("Flip Vertical midpoint: {} ", midpoint);
 
         // apply by setting z = z(min)+element_step
         for (MapNode node : multiSelectList) {
             double newZ = midpoint + (midpoint - node.z);
             node.z = roundUpDoubleToDecimalPlaces(newZ, 3);
 
-            LOG.info("post Flip Vertical x: {} y: {} z: {}",node.x, node.y,node.z);
+            // Debug: Output nodes after change
+            if (bDebugFlipVertical) LOG.info("post Flip Vertical x: {} y: {} z: {}",node.x, node.y,node.z);
         }
 
     }
