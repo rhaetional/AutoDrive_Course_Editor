@@ -1,3 +1,9 @@
+## Additional Features in this Fork
+### v1.0.6-rhae.1
+- New Scan menu entry to move all out-of-bounds nodes to centre
+- New Align buttons to align selected nodes horizontally/vertically and distribute them evenly along that axis
+- New Edit Buttons to flip selected nodes across horizontal oder vertical axis
+
 ## Java
 A Java version **greater than 11** is required. ( JRE or JDK are both possible )<br>
 Current Java versions can be downloaded [here](https://www.oracle.com/java/technologies/javase-downloads.html) and installation instructions can be found [here](https://www3.ntu.edu.sg/home/ehchua/programming/howto/JDK_Howto.html)

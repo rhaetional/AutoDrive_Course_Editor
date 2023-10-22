@@ -6,6 +6,18 @@
         </head>
         <body style="font-size:14;">
 
+            <!-------------------------------->
+            <!-- Start version 1.0.6-rhae.1 -->
+            <!-------------------------------->
+
+            <h3 style="font-family:helvetica;">Update to v1.0.6-rhae.1</h2>
+            <p><u>Added</u></p>
+            <ul>
+                <li>New Scan menu entry to move all out-of-bounds nodes to centre</li>
+                <li>New Align buttons to align and evenly space selected nodes</li>
+                <li>New Edit Buttons to flip selected nodes horizontally or vertically</li>
+            </ul>
+
             <!------------------------->
             <!-- Start version 1.0.6 -->
             <!------------------------->

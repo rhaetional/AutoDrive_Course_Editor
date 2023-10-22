@@ -1,24 +1,18 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <AutoDriveEditor>
-    <latest_version>1.0.6</latest_version>
+    <latest_version>1.0.6-rhae.1</latest_version>
     <version_notes><![CDATA[<html>
         <head>
-            <title>Version Notes</title>
+            <title>Version Notes (Fork Rhaetional)</title>
         </head>
         <body>
-            <h3 style="font-family:verdana;">Update to v1.0.6</h2>
+            <h3 style="font-family:helvetica;">Update to v1.0.6-rhae.1</h2>
             <p><u>Added</u></p>
             <ul>
-                <li>Preview while multi selecting, can see what nodes are selected while dragging the mouse.</li>
+                <li>New Scan menu entry to move all out-of-bounds nodes to centre</li>
+                <li>New Align buttons to align and evenly space selected nodes</li>
+                <li>New Edit Buttons to flip selected nodes horizontally or vertically</li>
             </ul>
-            <p><u>Fixed</u></p>
-            <ul>
-                <li>Fixed inverted selection on grid snapping button.</li>
-                <li>Fixed Cut/Copy/Paste not working due to non updated menu items.</li>
-                <li>Fixed Rotation centre offset changing/control node jumping on Undo/Redo.</li>
-                <li>Fixed crash due to missing entries in <KnownMapSettings> key (EditorConfig.xml)</li>
-            </ul>
-            <p>Visit the Release Page <a href="https://github.com/KillBait/AutoDrive_Course_Editor/releases">Here</a>.</p>
         </body>
         </html>]]>
     </version_notes>
