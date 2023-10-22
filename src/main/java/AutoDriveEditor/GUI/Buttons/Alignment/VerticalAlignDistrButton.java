@@ -35,12 +35,16 @@ public class VerticalAlignDistrButton extends AlignBaseButton {
     @Override
     protected void adjustNodesTo(MapNode toNode) {
 
+        //local debug flag
+        boolean bDebugVAlignDistr = false;
+
         LOG.info("Vertically Aligning'n'Distributing {} nodes at world X coordinate {}",multiSelectList.size(), toNode.x);
         changeManager.addChangeable( new AlignmentChanger(multiSelectList, toNode.x, 0, 0));
 
-        for (MapNode node : multiSelectList) {
-            LOG.info("pre VAD x: {} y: {} z: {}",node.x, node.y,node.z);
-        }
+        // print original coord for debugging
+        if (bDebugVAlignDistr)
+            for (MapNode node : multiSelectList)
+                LOG.info("pre VAD x: {} y: {} z: {}", node.x, node.y, node.z);
 
         // Sort List by Z coordinate
         multiSelectList.sort(Comparator.comparingDouble(value -> value.z));
@@ -51,7 +55,8 @@ public class VerticalAlignDistrButton extends AlignBaseButton {
         // calculate element step to three decimals
         double stepSize = distance / gapCount;
         double currentZ = multiSelectList.getFirst().z;
-        LOG.info("VAD distance: {} gaps : {} step-size: {} startingZ: {}", distance, gapCount, stepSize, currentZ);
+
+        if (bDebugVAlignDistr) LOG.info("VAD distance: {} gaps : {} step-size: {} startingZ: {}", distance, gapCount, stepSize, currentZ);
 
         // apply by setting z = z(min)+element_step
         for (MapNode node : multiSelectList) {
@@ -59,7 +64,7 @@ public class VerticalAlignDistrButton extends AlignBaseButton {
             node.z = roundUpDoubleToDecimalPlaces(currentZ, 3);
             currentZ = currentZ + stepSize;
 
-            LOG.info("post VAD x: {} y: {} z: {}",node.x, node.y,node.z);
+            if (bDebugVAlignDistr) LOG.info("post VAD x: {} y: {} z: {}",node.x, node.y,node.z);
         }
 
 
