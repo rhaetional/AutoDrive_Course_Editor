@@ -34,11 +34,17 @@ public class HorizontalAlignDistrButton extends AlignBaseButton {
 
     @Override
     protected void adjustNodesTo(MapNode toNode) {
+
+        //local debug flag
+        boolean bDebugHAlignDistr = false;
+
         LOG.info("Horizontally Aligning'n'Distributing {} nodes at world Z coordinate {}",multiSelectList.size(), toNode.z);
         changeManager.addChangeable( new AlignmentChanger(multiSelectList, 0, 0, toNode.z));
-        for (MapNode node : multiSelectList) {
-            LOG.info("pre HAD x: {} y: {} z: {}",node.x, node.y,node.z);
-        }
+
+        // print original coord for debugging
+        if (bDebugHAlignDistr)
+            for (MapNode node : multiSelectList)
+                LOG.info("pre HAD x: {} y: {} z: {}", node.x, node.y, node.z);
 
 
         // Sort List by X coordinate
@@ -50,7 +56,8 @@ public class HorizontalAlignDistrButton extends AlignBaseButton {
         // calculate element step to three decimals
         double stepSize = distance / gapCount;
         double currentX = multiSelectList.getFirst().x;
-        LOG.info("HAD distance: {} gaps : {} step-size: {} startingX: {}", distance, gapCount, stepSize, currentX);
+
+        if (bDebugHAlignDistr) LOG.info("HAD distance: {} gaps : {} step-size: {} startingX: {}", distance, gapCount, stepSize, currentX);
 
         // apply by setting z = z(min)+element_step
         for (MapNode node : multiSelectList) {
@@ -58,7 +65,7 @@ public class HorizontalAlignDistrButton extends AlignBaseButton {
             node.x = roundUpDoubleToDecimalPlaces(currentX, 3);
             currentX = currentX + stepSize;
 
-            LOG.info("post HAD x: {} y: {} z: {}",node.x, node.y,node.z);
+            if (bDebugHAlignDistr) LOG.info("post HAD x: {} y: {} z: {}", node.x, node.y, node.z);
         }
 
     }
