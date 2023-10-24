@@ -529,6 +529,9 @@ public class MenuListener implements ActionListener, ItemListener {
             case MENU_DEBUG_MOVETO_NODE:
                 centreNodeDialog();
                 break;
+            case MENU_DEBUG_NETWORKNODES_VIEW:
+                mapPanel.viewNetworkNodesList();
+                break;
         }
 
     }

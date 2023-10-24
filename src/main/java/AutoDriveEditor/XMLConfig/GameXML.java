@@ -87,6 +87,7 @@ public class GameXML {
                 mapMenuEnabled(true);
                 heightmapMenuEnabled(true);
                 scanMenuEnabled(true);
+                viewNetworkNodesMenuEnabled(true);
 
                 loadConfigMenuItem.setEnabled(true);
                 loadRoutesXML.setEnabled(true);

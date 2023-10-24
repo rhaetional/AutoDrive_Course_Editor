@@ -1331,6 +1331,13 @@ public class MapPanel extends JPanel {
         getMapPanel().moveMapBy((int) x, (int) y);
     }
 
+    public void viewNetworkNodesList() {
+        if (roadMap != null) {
+            LOG.info("viewNetworkNodesList viewNetworkNodesList");
+            RouteNodesJTable networkNodesTable = new RouteNodesJTable(roadMap);
+        }
+    }
+
     //
     // Dialog for Centre Node
     //

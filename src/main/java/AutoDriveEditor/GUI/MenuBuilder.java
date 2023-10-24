@@ -81,6 +81,7 @@ public class MenuBuilder {
     public static final String MENU_DEBUG_SELECTED_LOCATION = "DEBUG SELECTED LOCATION";
     public static final String MENU_DEBUG_PROFILE = "DEBUG PROFILE";
     public static final String MENU_DEBUG_HEIGHTMAP = "DEBUG HEIGHTMAP";
+    public static final String MENU_DEBUG_NETWORKNODES_VIEW = "DEBUG NETWORK NODES LIST";
     public static final String MENU_DEBUG_TEST = "TEST";
 
     public static final String MENU_DEBUG_LOG_FILEIO = "LOG FILEIO";
@@ -175,6 +176,7 @@ public class MenuBuilder {
     public static boolean bDebugShowSelectedLocation;
     public static boolean bDebugProfile;
     public static boolean bDebugShowHeightMapInfo;
+    public static JMenuItem viewNetworkNodesList;
     public static boolean bDebugTest;
 
     public static boolean bDebugLogZoomScale;
@@ -302,6 +304,10 @@ public class MenuBuilder {
         makeCheckBoxMenuItem("menu_debug_shownodelocationinfo", "menu_debug_shownodelocationinfo_accstring", KeyEvent.VK_7, InputEvent.ALT_DOWN_MASK, bDebugShowSelectedLocation, debugMenu, menuListener, MENU_DEBUG_SELECTED_LOCATION, true);
         makeCheckBoxMenuItem("menu_debug_profile", "menu_debug_profile_accstring", bDebugProfile, debugMenu, menuListener, MENU_DEBUG_PROFILE, true);
         makeCheckBoxMenuItem("menu_debug_heightmap", "menu_debug_heightmap_accstring", bDebugShowHeightMapInfo, debugMenu, menuListener, MENU_DEBUG_HEIGHTMAP, true);
+
+        // View Route Node information
+        viewNetworkNodesList = makeMenuItem("menu_debug_network_nodes_list", "menu_debug_network_nodes_list_accstring", debugMenu, menuListener, MENU_DEBUG_NETWORKNODES_VIEW,false);
+
         if (EXPERIMENTAL) {
             makeCheckBoxMenuItem("menu_debug_test", "menu_debug_test_accstring", bDebugTest, debugMenu, menuListener, MENU_DEBUG_TEST, true);
         }
@@ -384,5 +390,9 @@ public class MenuBuilder {
     public static void scanMenuEnabled(boolean enabled) {
         scanNetworkMenuItem.setEnabled(enabled);
         mergeNodesMenuItem.setEnabled(enabled);
+    }
+
+    public static void viewNetworkNodesMenuEnabled(boolean enabled) {
+        viewNetworkNodesList.setEnabled(enabled);
     }
 }
