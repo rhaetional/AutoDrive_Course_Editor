@@ -16,6 +16,9 @@ import static AutoDriveEditor.Utils.MathUtils.roundUpDoubleToDecimalPlaces;
 
 public class HorizontalAlignDistrButton extends AlignBaseButton {
 
+    // debug flag (local, hard-coded for now)
+    private boolean DEBUG = false;
+    
     public HorizontalAlignDistrButton(JPanel panel) {
         button = makeImageToggleButton("buttons/horizontaldistralign","buttons/horizontaldistralign_selected", null,"align_horizontal_distribute_tooltip","align_horizontal_distribute_alt", panel, false, false, null, false, this);
     }
@@ -35,14 +38,11 @@ public class HorizontalAlignDistrButton extends AlignBaseButton {
     @Override
     protected void adjustNodesTo(MapNode toNode) {
 
-        //local debug flag
-        boolean bDebugHAlignDistr = false;
-
         LOG.info("Horizontally Aligning'n'Distributing {} nodes at world Z coordinate {}",multiSelectList.size(), toNode.z);
         changeManager.addChangeable( new AlignmentChanger(multiSelectList, 0, 0, toNode.z));
 
         // print original coord for debugging
-        if (bDebugHAlignDistr)
+        if (DEBUG)
             for (MapNode node : multiSelectList)
                 LOG.info("pre HAD x: {} y: {} z: {}", node.x, node.y, node.z);
 
@@ -57,7 +57,7 @@ public class HorizontalAlignDistrButton extends AlignBaseButton {
         double stepSize = distance / gapCount;
         double currentX = multiSelectList.getFirst().x;
 
-        if (bDebugHAlignDistr) LOG.info("HAD distance: {} gaps : {} step-size: {} startingX: {}", distance, gapCount, stepSize, currentX);
+        if (DEBUG) LOG.info("HAD distance: {} gaps : {} step-size: {} startingX: {}", distance, gapCount, stepSize, currentX);
 
         // apply by setting z = z(min)+element_step
         for (MapNode node : multiSelectList) {
@@ -65,7 +65,7 @@ public class HorizontalAlignDistrButton extends AlignBaseButton {
             node.x = roundUpDoubleToDecimalPlaces(currentX, 3);
             currentX = currentX + stepSize;
 
-            if (bDebugHAlignDistr) LOG.info("post HAD x: {} y: {} z: {}", node.x, node.y, node.z);
+            if (DEBUG) LOG.info("post HAD x: {} y: {} z: {}", node.x, node.y, node.z);
         }
 
     }
