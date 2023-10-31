@@ -15,8 +15,11 @@ import static AutoDriveEditor.Utils.MathUtils.roundUpDoubleToDecimalPlaces;
 
 public final class FlipHorizontalButton extends AlignBaseButton {
 
+    //local debug flag
+    private boolean DEBUG = false;
+
     public FlipHorizontalButton(JPanel panel) {
-        button = makeImageToggleButton("buttons/flip_horizontal","buttons/flip_horizontal_selected", null,"flip_horizontal_tooltip","flip_horizontal_alt", panel, false, false,  null, false, this);
+        button = makeImageToggleButton("buttons/flip_horizontal","buttons/flip_horizontal_selected", null,"copypaste_flip_horizontal_tooltip","copypaste_flip_horizontal_alt", panel, false, false,  null, false, this);
     }
 
     @Override
@@ -29,19 +32,16 @@ public final class FlipHorizontalButton extends AlignBaseButton {
     public String getButtonPanel() { return "Edit"; }
 
     @Override
-    public String getInfoText() { return getLocaleString("flip_horizontal_tooltip"); }
+    public String getInfoText() { return getLocaleString("copypaste_flip_horizontal_tooltip"); }
 
     @Override
     protected void adjustNodesTo(MapNode toNode) {
-
-        //local debug flag
-        boolean bDebugFlipHorizontal = false;
 
         LOG.info("Horizontally Flipping {} nodes at world Z coordinate {}",multiSelectList.size(), toNode.z);
         changeManager.addChangeable( new AlignBaseButton.AlignmentChanger(multiSelectList, 0, 0, toNode.z));
 
         // Debug: Output nodes before change
-        if (bDebugFlipHorizontal)
+        if (DEBUG)
             for (MapNode node : multiSelectList)
                 LOG.info("pre Flip Horizontal x: {} y: {} z: {}", node.x, node.y, node.z);
 
@@ -51,7 +51,7 @@ public final class FlipHorizontalButton extends AlignBaseButton {
         // calculate midpoint
         double midpoint = (multiSelectList.getLast().x + multiSelectList.getFirst().x)/2;
 
-        if (bDebugFlipHorizontal) LOG.info("Flip Horizontal midpoint: {} ", midpoint);
+        if (DEBUG) LOG.info("Flip Horizontal midpoint: {} ", midpoint);
 
         // apply by setting z = z(min)+element_step
         for (MapNode node : multiSelectList) {
@@ -59,7 +59,7 @@ public final class FlipHorizontalButton extends AlignBaseButton {
             node.x = roundUpDoubleToDecimalPlaces(newX, 3);
 
             // Debug: Output nodes after change
-            if (bDebugFlipHorizontal) LOG.info("post Flip Horizontal x: {} y: {} z: {}",node.x, node.y,node.z);
+            if (DEBUG) LOG.info("post Flip Horizontal x: {} y: {} z: {}",node.x, node.y,node.z);
         }
 
     }
