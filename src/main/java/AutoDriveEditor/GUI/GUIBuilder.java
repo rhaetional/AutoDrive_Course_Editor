@@ -15,6 +15,7 @@ import AutoDriveEditor.GUI.Buttons.Options.*;
 import AutoDriveEditor.GUI.Buttons.Testing.TestButton;
 import AutoDriveEditor.Listeners.CurvePanelListener;
 import AutoDriveEditor.MapPanel.MapPanel;
+import AutoDriveEditor.MapPanel.RouteNodesTable;
 
 import javax.swing.*;
 import javax.swing.border.BevelBorder;
@@ -49,6 +50,9 @@ public class GUIBuilder {
     // Main Window Reference
 
     public static MapPanel mapPanel;
+
+    // Nodes Table
+    public static RouteNodesTable routeNodesTable;
 
     // Curve Panel
 
@@ -270,6 +274,12 @@ public class GUIBuilder {
         }
 
         return buttonToolbar;
+   }
+
+   public static JPanel createRouteNodesTable() {
+        routeNodesTable = new RouteNodesTable(mapPanel.getRoadMap());
+
+        return routeNodesTable;
    }
 
     private static void switchToolbarLayoutToHorizontal() {

@@ -3,81 +3,103 @@ package AutoDriveEditor.MapPanel;
 
 import AutoDriveEditor.RoadNetwork.*;
 
-import javax.swing.JFrame;
-import javax.swing.JScrollPane;
-import javax.swing.JTable;
+import javax.swing.*;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.TableModel;
+import java.awt.*;
+import java.util.List;
 import java.util.Vector;
 
-public class RouteNodesJTable {
-    // frame
-    JFrame f;
+import static AutoDriveEditor.GUI.GUIBuilder.routeNodesTable;
+
+public class RouteNodesTable extends JPanel {
     // Table
-    JTable j;
+    private final JTable nodesTable;
+    private final RouteNodesTableModel model;
 
     // Constructor
-    RouteNodesJTable(RoadMap roadMap) {
-        final RouteNodesTableModel model = new RouteNodesTableModel();
-        // Frame initialization
-        f = new JFrame();
+    public RouteNodesTable(RoadMap roadMap) {
 
-        // Frame Title
-        f.setTitle("Network Nodes List");
+        this.setLayout(new BorderLayout());
+
+        model = new RouteNodesTableModel();
 
         // Initializing the JTable
-        j = new JTable(model);
-        j.setBounds(30, 40, 200, 300);
-        j.setAutoCreateRowSorter(true);
+        nodesTable = new JTable(model);
+        //nodesTable.setBounds(30, 40, 200, 300);
+        nodesTable.setAutoCreateRowSorter(true);
 
-        // Data to be displayed in the JTable
-        for (MapNode node : RoadMap.networkNodesList) {
-            model.addNode(node);
-        }
+        refreshNodes(roadMap);
 
-        // adding it to JScrollPane
-        JScrollPane sp = new JScrollPane(j);
-        f.add(sp);
-        // Frame Size
-        f.setSize(1024, 512);
-        // Frame Visible = true
-        f.setVisible(true);
+        // adding table to JScrollPane
+        JScrollPane sp = new JScrollPane(nodesTable);
+
+        // add to panel
+        this.add(sp, BorderLayout.CENTER);
     }
 
-    // Unsere Implementation des TableModels
-    class RouteNodesTableModel implements TableModel {
-        private Vector<MapNode> nodes = new Vector<>();
-        private Vector<TableModelListener> listeners = new Vector<>();
+    public static RouteNodesTable getRouteNodesTable() {
+        return routeNodesTable;
+    }
+
+    public void refreshNodes(RoadMap roadMap) {
+        model.clearAllNodes();
+        if (roadMap != null) {
+            // Data to be displayed in the JTable
+            for (MapNode node : RoadMap.networkNodesList) {
+                model.addNode(node);
+            }
+        }
+    }
+
+    /**
+     * Table Model mapping MapNode to rows
+     */
+    static class RouteNodesTableModel implements TableModel {
+        private final Vector<MapNode> nodes = new Vector<>();
+        private final Vector<TableModelListener> listeners = new Vector<>();
 
         public void addNode(MapNode node) {
-            // Das wird der Index des Vehikels werden
+
+            // new row index
             int index = nodes.size();
             nodes.add(node);
 
-            // Jetzt werden alle Listeners benachrichtigt
-
-            // Zuerst ein Event, "neue Row an der Stelle index" herstellen
+            // Event to create row at index
             TableModelEvent e = new TableModelEvent(this, index, index,
                     TableModelEvent.ALL_COLUMNS, TableModelEvent.INSERT);
 
-            // Nun das Event verschicken
-            for (int i = 0, n = listeners.size(); i < n; i++) {
-                ((TableModelListener) listeners.get(i)).tableChanged(e);
+            // Send the event
+            for (TableModelListener listener : listeners) {
+                listener.tableChanged(e);
             }
         }
 
-        // Die Anzahl Columns
+        public void removeNode(int rowIndex) {
+            nodes.remove(rowIndex);
+
+            // Fire a table model event to notify listeners that the data has changed
+            TableModelEvent e = new TableModelEvent(this, rowIndex, rowIndex, TableModelEvent.ALL_COLUMNS, TableModelEvent.DELETE);
+            for (TableModelListener listener : listeners) {
+                listener.tableChanged(e);
+            }
+        }
+
+        public void clearAllNodes() {
+            for (int i = nodes.size() - 1; i >= 0; i--) {
+                this.removeNode(i);
+            }
+        }
+
         public int getColumnCount() {
             return 7;
         }
 
-        // Die Anzahl Vehikel
         public int getRowCount() {
             return nodes.size();
         }
 
-        // Die Titel der einzelnen Columns
         public String getColumnName(int column) {
             switch (column) {
                 case 0:
@@ -99,9 +121,8 @@ public class RouteNodesJTable {
             }
         }
 
-        // Der Wert der Zelle (rowIndex, columnIndex)
         public Object getValueAt(int rowIndex, int columnIndex) {
-            MapNode node = (MapNode) nodes.get(rowIndex);
+            MapNode node = nodes.get(rowIndex);
 
             switch (columnIndex) {
                 case 0:
@@ -123,7 +144,6 @@ public class RouteNodesJTable {
             }
         }
 
-        // Eine Angabe, welchen Typ von Objekten in den Columns angezeigt werden soll
         public Class getColumnClass(int columnIndex) {
             switch (columnIndex) {
                 case 0:
@@ -153,7 +173,6 @@ public class RouteNodesJTable {
             listeners.remove(l);
         }
 
-
         public boolean isCellEditable(int rowIndex, int columnIndex) {
             if (columnIndex == 0)
                 return false;
@@ -169,6 +188,9 @@ public class RouteNodesJTable {
                     break;
                 case 5:
                     node.setMarkerGroup((String) aValue);
+                    break;
+                case 6:
+                    node.setParkedVehiclesList((List<Integer>) aValue);
                     break;
             }
         }

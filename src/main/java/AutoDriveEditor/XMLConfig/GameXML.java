@@ -32,6 +32,7 @@ import static AutoDriveEditor.Managers.MultiSelectManager.clearMultiSelection;
 import static AutoDriveEditor.Managers.ScanManager.scanNetworkForOverlapNodes;
 import static AutoDriveEditor.MapPanel.MapImage.*;
 import static AutoDriveEditor.MapPanel.MapPanel.*;
+import static AutoDriveEditor.MapPanel.RouteNodesTable.*;
 import static AutoDriveEditor.RoadNetwork.RoadMap.createMapNode;
 import static AutoDriveEditor.RoadNetwork.RoadMap.setRoadMapNodes;
 import static AutoDriveEditor.Utils.FileUtils.removeExtension;
@@ -61,6 +62,7 @@ public class GameXML {
             if (roadMap != null) {
                 configType = CONFIG_SAVEGAME;
                 getMapPanel().setRoadMap(roadMap);
+                getRouteNodesTable().refreshNodes(roadMap);
                 xmlConfigFile = fXmlFile;
                 loadMapImage(RoadMap.mapName);
                 loadHeightMap(RoadMap.mapName);
@@ -82,7 +84,6 @@ public class GameXML {
                 mapMenuEnabled(true);
                 heightmapMenuEnabled(true);
                 scanMenuEnabled(true);
-                viewNetworkNodesMenuEnabled(true);
 
                 loadConfigMenuItem.setEnabled(true);
                 loadRoutesXML.setEnabled(true);
