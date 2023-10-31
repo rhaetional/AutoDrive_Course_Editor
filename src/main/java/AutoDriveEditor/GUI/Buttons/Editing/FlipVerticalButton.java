@@ -15,8 +15,11 @@ import static AutoDriveEditor.Utils.MathUtils.roundUpDoubleToDecimalPlaces;
 
 public final class FlipVerticalButton extends AlignBaseButton {
 
+    //local debug flag
+    private boolean DEBUG = false;
+
     public FlipVerticalButton(JPanel panel) {
-        button = makeImageToggleButton("buttons/flip_vertical","buttons/flip_vertical_selected", null,"flip_vertical_tooltip","flip_vertical_alt", panel, false, false,  null, false, this);
+        button = makeImageToggleButton("buttons/flip_vertical","buttons/flip_vertical_selected", null,"copypaste_flip_vertical_tooltip","copypaste_flip_vertical_alt", panel, false, false,  null, false, this);
     }
 
     @Override
@@ -29,19 +32,17 @@ public final class FlipVerticalButton extends AlignBaseButton {
     public String getButtonPanel() { return "Edit"; }
 
     @Override
-    public String getInfoText() { return getLocaleString("flip_vertical_tooltip"); }
+    public String getInfoText() { return getLocaleString("copypaste_flip_vertical_tooltip"); }
 
     @Override
     protected void adjustNodesTo(MapNode toNode) {
 
-        //local debug flag
-        boolean bDebugFlipVertical = false;
 
         LOG.info("Vertically Flipping {} nodes at world Z coordinate {}",multiSelectList.size(), toNode.z);
         changeManager.addChangeable( new AlignmentChanger(multiSelectList, 0, 0, toNode.z));
 
         // Debug: Output nodes before change
-        if (bDebugFlipVertical)
+        if (DEBUG)
             for (MapNode node : multiSelectList)
                 LOG.info("pre Flip Vertical x: {} y: {} z: {}", node.x, node.y, node.z);
 
@@ -51,7 +52,7 @@ public final class FlipVerticalButton extends AlignBaseButton {
         // calculate midpoint
         double midpoint = (multiSelectList.getLast().z + multiSelectList.getFirst().z)/2;
 
-        if (bDebugFlipVertical) LOG.info("Flip Vertical midpoint: {} ", midpoint);
+        if (DEBUG) LOG.info("Flip Vertical midpoint: {} ", midpoint);
 
         // apply by setting z = z(min)+element_step
         for (MapNode node : multiSelectList) {
@@ -59,7 +60,7 @@ public final class FlipVerticalButton extends AlignBaseButton {
             node.z = roundUpDoubleToDecimalPlaces(newZ, 3);
 
             // Debug: Output nodes after change
-            if (bDebugFlipVertical) LOG.info("post Flip Vertical x: {} y: {} z: {}",node.x, node.y,node.z);
+            if (DEBUG) LOG.info("post Flip Vertical x: {} y: {} z: {}",node.x, node.y,node.z);
         }
 
     }
