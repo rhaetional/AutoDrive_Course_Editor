@@ -2,6 +2,7 @@ package AutoDriveEditor.GUI.Buttons.Editing;
 
 import AutoDriveEditor.GUI.Buttons.AlignBaseButton;
 import AutoDriveEditor.RoadNetwork.MapNode;
+import AutoDriveEditor.Utils.Classes.CoordinateChanger;
 
 import javax.swing.*;
 import java.util.Comparator;
@@ -38,30 +39,35 @@ public final class FlipVerticalButton extends AlignBaseButton {
     protected void adjustNodesTo(MapNode toNode) {
 
 
-        LOG.info("Vertically Flipping {} nodes at world Z coordinate {}",multiSelectList.size(), toNode.z);
-        changeManager.addChangeable( new AlignmentChanger(multiSelectList, 0, 0, toNode.z));
+        if (!multiSelectList.isEmpty()) {
+            LOG.info("Vertically Flipping {} nodes at world Z coordinate {}", multiSelectList.size(), toNode.z);
+            CoordinateChanger coordChanger = new CoordinateChanger();
 
-        // Debug: Output nodes before change
-        if (DEBUG)
-            for (MapNode node : multiSelectList)
-                LOG.info("pre Flip Vertical x: {} y: {} z: {}", node.x, node.y, node.z);
+            // Debug: Output nodes before change
+            if (DEBUG)
+                for (MapNode node : multiSelectList)
+                    LOG.info("pre Flip Vertical x: {} y: {} z: {}", node.x, node.y, node.z);
 
-        // Sort List by Z coordinate
-        multiSelectList.sort(Comparator.comparingDouble(value -> value.z));
+            // Sort List by Z coordinate
+            multiSelectList.sort(Comparator.comparingDouble(value -> value.z));
 
-        // calculate midpoint
-        double midpoint = (multiSelectList.getLast().z + multiSelectList.getFirst().z)/2;
+            // calculate midpoint
+            double midpoint = (multiSelectList.getLast().z + multiSelectList.getFirst().z) / 2;
 
-        if (DEBUG) LOG.info("Flip Vertical midpoint: {} ", midpoint);
+            if (DEBUG) LOG.info("Flip Vertical midpoint: {} ", midpoint);
 
-        // apply by setting z = z(min)+element_step
-        for (MapNode node : multiSelectList) {
-            double newZ = midpoint + (midpoint - node.z);
-            node.z = roundUpDoubleToDecimalPlaces(newZ, 3);
+            // apply by setting z = z(min)+element_step
+            for (MapNode node : multiSelectList) {
+                double newZ = midpoint + (midpoint - node.z);
+                newZ = roundUpDoubleToDecimalPlaces(newZ, 3);
 
-            // Debug: Output nodes after change
-            if (DEBUG) LOG.info("post Flip Vertical x: {} y: {} z: {}",node.x, node.y,node.z);
+                coordChanger.addCoordinateChange(node, node.x, node.y, newZ);
+                node.z = newZ;
+
+                // Debug: Output nodes after change
+                if (DEBUG) LOG.info("post Flip Vertical x: {} y: {} z: {}", node.x, node.y, node.z);
+            }
+            changeManager.addChangeable(coordChanger);
         }
-
     }
 }
