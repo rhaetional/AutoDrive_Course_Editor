@@ -69,7 +69,7 @@ public class RouteNodesJTable {
 
         // Die Anzahl Columns
         public int getColumnCount() {
-            return 6;
+            return 7;
         }
 
         // Die Anzahl Vehikel
@@ -92,6 +92,8 @@ public class RouteNodesJTable {
                     return "Marker Name";
                 case 5:
                     return "Marker Group";
+                case 6:
+                    return "Parking Destination";
                 default:
                     return null;
             }
@@ -114,6 +116,8 @@ public class RouteNodesJTable {
                     return node.hasMapMarker() ? node.getMarkerName() : "";
                 case 5:
                     return node.hasMapMarker() ? node.getMarkerGroup() : "";
+                case 6:
+                    return node.isParkDestination() ? node.getParkedVehiclesList().toString() : "";
                 default:
                     return null;
             }
@@ -133,6 +137,8 @@ public class RouteNodesJTable {
                 case 4:
                     return String.class;
                 case 5:
+                    return String.class;
+                case 6:
                     return String.class;
                 default:
                     return null;
