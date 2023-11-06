@@ -229,6 +229,8 @@ public class GUIBuilder {
         buttonManager.addButton(new CutSelectionButton(editPanel));
         buttonManager.addButton(new CopySelectionButton(editPanel));
         buttonManager.addButton(new PasteSelectionButton(editPanel));
+        buttonManager.addButton(new FlipHorizontalButton(editPanel));
+        buttonManager.addButton(new FlipVerticalButton(editPanel));
         buttonManager.addButton(new RotationButton(editPanel));
 
         //
@@ -301,7 +303,7 @@ public class GUIBuilder {
         markerPanel.setMaximumSize(new Dimension(80, (int)markerPanel.getPreferredSize().getHeight()));
         alignPanel.setLayout(new GridLayout(3,2,8,8));
         alignPanel.setMaximumSize(new Dimension(80, (int)alignPanel.getPreferredSize().getHeight()));
-        editPanel.setLayout(new GridLayout(3,2,8,8));
+        editPanel.setLayout(new GridLayout(4,2,8,8));
         editPanel.setMaximumSize(new Dimension(80, (int) editPanel.getPreferredSize().getHeight()));
         optionsPanel.setLayout(new GridLayout(3,2,8,8));
         optionsPanel.setMaximumSize(new Dimension(80, (int) optionsPanel.getPreferredSize().getHeight()));
