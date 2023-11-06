@@ -1,9 +1,6 @@
 package AutoDriveEditor.GUI;
 
-import AutoDriveEditor.GUI.Buttons.Alignment.DepthAlignButton;
-import AutoDriveEditor.GUI.Buttons.Alignment.EditLocationButton;
-import AutoDriveEditor.GUI.Buttons.Alignment.HorizontalAlignButton;
-import AutoDriveEditor.GUI.Buttons.Alignment.VerticalAlignButton;
+import AutoDriveEditor.GUI.Buttons.Alignment.*;
 import AutoDriveEditor.GUI.Buttons.Curves.CubicCurveButton;
 import AutoDriveEditor.GUI.Buttons.Curves.QuadCurveButton;
 import AutoDriveEditor.GUI.Buttons.Editing.*;
@@ -212,6 +209,9 @@ public class GUIBuilder {
 
         buttonManager.addButton(new HorizontalAlignButton(alignPanel));
         buttonManager.addButton(new VerticalAlignButton(alignPanel));
+        buttonManager.addButton(new HorizontalAlignDistrButton(alignPanel));
+        buttonManager.addButton(new VerticalAlignDistrButton(alignPanel));
+
         buttonManager.addButton(new DepthAlignButton(alignPanel));
         buttonManager.addButton(new EditLocationButton(alignPanel));
 
@@ -299,7 +299,7 @@ public class GUIBuilder {
         curvesPanel.setMaximumSize(new Dimension(80, (int)curvesPanel.getPreferredSize().getHeight()));
         markerPanel.setLayout(new GridLayout(2,2,8,8));
         markerPanel.setMaximumSize(new Dimension(80, (int)markerPanel.getPreferredSize().getHeight()));
-        alignPanel.setLayout(new GridLayout(2,2,8,8));
+        alignPanel.setLayout(new GridLayout(3,2,8,8));
         alignPanel.setMaximumSize(new Dimension(80, (int)alignPanel.getPreferredSize().getHeight()));
         editPanel.setLayout(new GridLayout(3,2,8,8));
         editPanel.setMaximumSize(new Dimension(80, (int) editPanel.getPreferredSize().getHeight()));
