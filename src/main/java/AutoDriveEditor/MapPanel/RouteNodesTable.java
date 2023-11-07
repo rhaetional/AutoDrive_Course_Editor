@@ -8,47 +8,57 @@ import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.TableModel;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.List;
 import java.util.Vector;
 
 import static AutoDriveEditor.GUI.GUIBuilder.routeNodesTable;
 
 public class RouteNodesTable extends JPanel {
-    // Table
-    private final JTable nodesTable;
-    private final RouteNodesTableModel model;
+    private final RoadMap roadMap;
+    private final RouteNodesTableModel tableModel;
 
     // Constructor
     public RouteNodesTable(RoadMap roadMap) {
+        this.roadMap = roadMap;
 
         this.setLayout(new BorderLayout());
 
-        model = new RouteNodesTableModel();
+        tableModel = new RouteNodesTableModel();
 
         // Initializing the JTable
-        nodesTable = new JTable(model);
-        //nodesTable.setBounds(30, 40, 200, 300);
+        JTable nodesTable = new JTable(tableModel);
         nodesTable.setAutoCreateRowSorter(true);
-
-        refreshNodes(roadMap);
 
         // adding table to JScrollPane
         JScrollPane sp = new JScrollPane(nodesTable);
-
         // add to panel
         this.add(sp, BorderLayout.CENTER);
+
+        //
+        // Test Button
+        final JButton buttonUpdate = new JButton( "Update" );
+        buttonUpdate.addActionListener( new ActionListener(){
+            public void actionPerformed(ActionEvent e) {
+                tableModel.updateAllNodes();
+            }
+        });
+        this.add(buttonUpdate, BorderLayout.SOUTH);
+        //
+        //
     }
 
     public static RouteNodesTable getRouteNodesTable() {
         return routeNodesTable;
     }
 
-    public void refreshNodes(RoadMap roadMap) {
-        model.clearAllNodes();
+    public void loadRoadMap(RoadMap roadMap) {
+        tableModel.removeAllNodes();
         if (roadMap != null) {
             // Data to be displayed in the JTable
             for (MapNode node : RoadMap.networkNodesList) {
-                model.addNode(node);
+                tableModel.addNode(node);
             }
         }
     }
@@ -85,10 +95,26 @@ public class RouteNodesTable extends JPanel {
                 listener.tableChanged(e);
             }
         }
+        public void updateNode(MapNode mapNode) {
+            int rowIndex = nodes.indexOf(mapNode);
+            // Fire a table model event to notify listeners that the data has changed
+            TableModelEvent e = new TableModelEvent(this, rowIndex, rowIndex, TableModelEvent.ALL_COLUMNS, TableModelEvent.UPDATE);
+            for (TableModelListener listener : listeners) {
+                listener.tableChanged(e);
+            }
+        }
 
-        public void clearAllNodes() {
+        public void removeAllNodes() {
             for (int i = nodes.size() - 1; i >= 0; i--) {
                 this.removeNode(i);
+            }
+        }
+
+        public void updateAllNodes() {
+            int maxIndex = nodes.size() - 1;
+            TableModelEvent e = new TableModelEvent(this, 0, maxIndex, TableModelEvent.ALL_COLUMNS, TableModelEvent.UPDATE);
+            for (TableModelListener listener : listeners) {
+                listener.tableChanged(e);
             }
         }
 

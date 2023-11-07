@@ -60,7 +60,7 @@ public class RoutesXML {
             if (roadMap != null) {
                 configType = CONFIG_ROUTEMANAGER;
                 getMapPanel().setRoadMap(roadMap);
-                getRouteNodesTable().refreshNodes(roadMap);
+                getRouteNodesTable().loadRoadMap(roadMap);
                 xmlConfigFile = fXmlFile;
                 if (bDebugLogRouteManager) LOG.info("name = {}", fXmlFile.getName());
                 if (!skipRoutesCheck) {

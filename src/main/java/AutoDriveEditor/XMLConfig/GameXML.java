@@ -62,7 +62,7 @@ public class GameXML {
             if (roadMap != null) {
                 configType = CONFIG_SAVEGAME;
                 getMapPanel().setRoadMap(roadMap);
-                getRouteNodesTable().refreshNodes(roadMap);
+                getRouteNodesTable().loadRoadMap(roadMap);
                 xmlConfigFile = fXmlFile;
                 loadMapImage(RoadMap.mapName);
                 loadHeightMap(RoadMap.mapName);
