@@ -62,7 +62,6 @@ public class GameXML {
             if (roadMap != null) {
                 configType = CONFIG_SAVEGAME;
                 getMapPanel().setRoadMap(roadMap);
-                getRouteNodesTable().loadRoadMap(roadMap);
                 xmlConfigFile = fXmlFile;
                 loadMapImage(RoadMap.mapName);
                 loadHeightMap(RoadMap.mapName);
@@ -377,6 +376,7 @@ public class GameXML {
         LOG.info("---------------------------------");
 
         RoadMap roadMap = new RoadMap();
+        roadMap.addPropertyChangeListener(getRouteNodesTable());
         setRoadMapNodes(roadMap, new LinkedList<>(nodes));
 
         // check for MapName element

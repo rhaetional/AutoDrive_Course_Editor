@@ -6,75 +6,119 @@ import AutoDriveEditor.RoadNetwork.*;
 import javax.swing.*;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
+import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableModel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Vector;
 
 import static AutoDriveEditor.GUI.GUIBuilder.routeNodesTable;
+import static AutoDriveEditor.Utils.LoggerUtils.LOG;
 
-public class RouteNodesTable extends JPanel {
-    private final RoadMap roadMap;
+/**
+ * JPanel to display a JTable of the MapNodes currently stored in MapPanel.RoadMap.networkNodesList.
+ * It implements PropertyChangeListener for RoadMap as subject to be informed when MapNodes are added or removed.
+ * Updates to existing nodes are "caught" by overloading RoadMap.refresh(), as RoadMap has no awareness about these
+ * changes to the networkNodesList
+ */
+public class RouteNodesTable extends JPanel implements PropertyChangeListener {
     private final RouteNodesTableModel tableModel;
+    // Debug privately for now
+    private final boolean bDebugRouteNodesTable = true;
 
-    // Constructor
-    public RouteNodesTable(RoadMap roadMap) {
-        this.roadMap = roadMap;
+    public RouteNodesTable() {
 
         this.setLayout(new BorderLayout());
-
         tableModel = new RouteNodesTableModel();
-
-        // Initializing the JTable
         JTable nodesTable = new JTable(tableModel);
         nodesTable.setAutoCreateRowSorter(true);
 
-        // adding table to JScrollPane
-        JScrollPane sp = new JScrollPane(nodesTable);
-        // add to panel
-        this.add(sp, BorderLayout.CENTER);
+        JScrollPane scrollPane = new JScrollPane(nodesTable);
+        this.add(scrollPane, BorderLayout.CENTER);
 
-        //
-        // Test Button
-        final JButton buttonUpdate = new JButton( "Update" );
-        buttonUpdate.addActionListener( new ActionListener(){
-            public void actionPerformed(ActionEvent e) {
-                tableModel.updateAllNodes();
-            }
-        });
+        JButton buttonUpdate = new JButton("Update");
+        buttonUpdate.addActionListener(new UpdateButtonListener());
         this.add(buttonUpdate, BorderLayout.SOUTH);
-        //
-        //
     }
 
     public static RouteNodesTable getRouteNodesTable() {
         return routeNodesTable;
     }
 
-    public void loadRoadMap(RoadMap roadMap) {
-        tableModel.removeAllNodes();
-        if (roadMap != null) {
+    public void loadRoadMap(LinkedList<MapNode> roadList) {
+        if (roadList != null) {
             // Data to be displayed in the JTable
-            for (MapNode node : RoadMap.networkNodesList) {
+            for (MapNode node : roadList) {
                 tableModel.addNode(node);
             }
         }
     }
 
+    public void unloadRoadMap() {
+        tableModel.removeAllNodes();
+    }
+
+    /**
+     * This method gets called when a bound property is changed.
+     *
+     * @param evt A PropertyChangeEvent object describing the event source
+     *            and the property that has changed.
+     */
+    @Override
+    public void propertyChange(PropertyChangeEvent evt) {
+        if (bDebugRouteNodesTable)
+            LOG.info("## bDebugRouteNodesTable ## Variation of {}\t\t({}\t->\t{})\t\tProperty in object {}", evt.getPropertyName(), evt.getOldValue(), evt.getNewValue(), evt.getSource());
+
+        if (Objects.equals(evt.getPropertyName(), "networkNodesList.remove")) {
+            tableModel.removeNode((MapNode) evt.getOldValue());
+        }
+        if (Objects.equals(evt.getPropertyName(), "networkNodesList.add")) {
+            tableModel.addNode((MapNode) evt.getNewValue());
+        }
+        if (Objects.equals(evt.getPropertyName(), "networkNodesList.replaceList")) {
+            // clear existing rows
+            if (evt.getOldValue() != null) {
+                unloadRoadMap();
+            }
+            if ((evt.getNewValue() != null) && (evt.getNewValue() instanceof LinkedList<?>)) {
+                loadRoadMap((LinkedList<MapNode>) evt.getNewValue());
+            }
+        }
+        if (Objects.equals(evt.getPropertyName(), "networkNodesList.refreshList")) {
+                tableModel.fireTableDataChanged();
+        }
+    }
+
+
     /**
      * Table Model mapping MapNode to rows
      */
-    static class RouteNodesTableModel implements TableModel {
-        private final Vector<MapNode> nodes = new Vector<>();
+    static class RouteNodesTableModel extends AbstractTableModel {
+        private final Vector<MapNode> nodeRows = new Vector<>();
+        private final String[] columnNames = {
+                "Node ID",
+                "X",
+                "Y",
+                "Z",
+                "Marker Name",
+                "Marker Group",
+                "Parking Destination"};
         private final Vector<TableModelListener> listeners = new Vector<>();
 
+        /**
+         * @param node
+         */
         public void addNode(MapNode node) {
 
             // new row index
-            int index = nodes.size();
-            nodes.add(node);
+            int index = nodeRows.size();
+            nodeRows.add(node);
 
             // Event to create row at index
             TableModelEvent e = new TableModelEvent(this, index, index,
@@ -86,8 +130,12 @@ public class RouteNodesTable extends JPanel {
             }
         }
 
-        public void removeNode(int rowIndex) {
-            nodes.remove(rowIndex);
+        /**
+         * @param mapNode
+         */
+        public void removeNode(MapNode mapNode) {
+            int rowIndex = nodeRows.indexOf(mapNode);
+            nodeRows.remove(rowIndex);
 
             // Fire a table model event to notify listeners that the data has changed
             TableModelEvent e = new TableModelEvent(this, rowIndex, rowIndex, TableModelEvent.ALL_COLUMNS, TableModelEvent.DELETE);
@@ -95,8 +143,9 @@ public class RouteNodesTable extends JPanel {
                 listener.tableChanged(e);
             }
         }
+
         public void updateNode(MapNode mapNode) {
-            int rowIndex = nodes.indexOf(mapNode);
+            int rowIndex = nodeRows.indexOf(mapNode);
             // Fire a table model event to notify listeners that the data has changed
             TableModelEvent e = new TableModelEvent(this, rowIndex, rowIndex, TableModelEvent.ALL_COLUMNS, TableModelEvent.UPDATE);
             for (TableModelListener listener : listeners) {
@@ -105,13 +154,13 @@ public class RouteNodesTable extends JPanel {
         }
 
         public void removeAllNodes() {
-            for (int i = nodes.size() - 1; i >= 0; i--) {
-                this.removeNode(i);
+            synchronized (nodeRows) {
+                nodeRows.removeAllElements();
             }
         }
 
         public void updateAllNodes() {
-            int maxIndex = nodes.size() - 1;
+            int maxIndex = nodeRows.size() - 1;
             TableModelEvent e = new TableModelEvent(this, 0, maxIndex, TableModelEvent.ALL_COLUMNS, TableModelEvent.UPDATE);
             for (TableModelListener listener : listeners) {
                 listener.tableChanged(e);
@@ -119,36 +168,20 @@ public class RouteNodesTable extends JPanel {
         }
 
         public int getColumnCount() {
-            return 7;
+            return columnNames.length;
         }
 
         public int getRowCount() {
-            return nodes.size();
+            return nodeRows.size();
         }
 
         public String getColumnName(int column) {
-            switch (column) {
-                case 0:
-                    return "Node ID";
-                case 1:
-                    return "X";
-                case 2:
-                    return "Y";
-                case 3:
-                    return "Z";
-                case 4:
-                    return "Marker Name";
-                case 5:
-                    return "Marker Group";
-                case 6:
-                    return "Parking Destination";
-                default:
-                    return null;
-            }
+            return columnNames[column];
         }
 
+        @Override
         public Object getValueAt(int rowIndex, int columnIndex) {
-            MapNode node = nodes.get(rowIndex);
+            MapNode node = nodeRows.get(rowIndex);
 
             switch (columnIndex) {
                 case 0:
@@ -168,6 +201,28 @@ public class RouteNodesTable extends JPanel {
                 default:
                     return null;
             }
+        }
+
+        @Override
+        public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
+            MapNode node = nodeRows.get(rowIndex);
+            switch (columnIndex) {
+                case 4:
+                    node.setMarkerName((String) aValue);
+                    break;
+                case 5:
+                    node.setMarkerGroup((String) aValue);
+                    break;
+                case 6:
+                    node.setParkedVehiclesList((List<Integer>) aValue);
+                    break;
+            }
+        }
+
+        //TODO: This does not seem to work. Revert to TableModel?
+        @Override
+        public void fireTableDataChanged() {
+            super.fireTableDataChanged();
         }
 
         public Class getColumnClass(int columnIndex) {
@@ -206,19 +261,14 @@ public class RouteNodesTable extends JPanel {
                 return true;
         }
 
-        public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
-            MapNode node = nodes.get(rowIndex);
-            switch (columnIndex) {
-                case 4:
-                    node.setMarkerName((String) aValue);
-                    break;
-                case 5:
-                    node.setMarkerGroup((String) aValue);
-                    break;
-                case 6:
-                    node.setParkedVehiclesList((List<Integer>) aValue);
-                    break;
-            }
+    }
+
+    /**
+     * Action Listener
+     */
+    private class UpdateButtonListener implements ActionListener {
+        public void actionPerformed(ActionEvent e) {
+            tableModel.updateAllNodes();
         }
     }
 

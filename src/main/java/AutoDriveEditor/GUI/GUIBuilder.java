@@ -277,7 +277,7 @@ public class GUIBuilder {
    }
 
    public static JPanel createRouteNodesTable() {
-        routeNodesTable = new RouteNodesTable(mapPanel.getRoadMap());
+        routeNodesTable = new RouteNodesTable();
         return routeNodesTable;
    }
 

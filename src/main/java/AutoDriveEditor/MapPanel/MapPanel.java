@@ -169,6 +169,14 @@ public class MapPanel extends JPanel {
             LOG.info("AutoSave is disabled");
         }
     }
+    //TODO: Find a better solution to signal changes
+//    @Override
+//    public void repaint() {
+//        super.repaint();
+//        if (roadMap != null) {
+//            roadMap.refreshListeners();
+//        }
+//    }
 
     public static void startAutoSaveThread() {
         LOG.info("Starting AutoSave Thread");
