@@ -175,12 +175,14 @@ public class AddMarkerButton extends MarkerBaseButton {
             this.markerNode.removeMapMarker();
             //RoadMap.removeMapMarker(this.markerToChange);
             getMapPanel().repaint();
+            getMapPanel().getRoadMap().refreshListeners();
             setStale(this.isStale);
         }
 
         public void redo(){
             this.markerNode.createMapMarker(this.markerName, this.markerGroup);
             //roadMap.createMapMarker(this.markerToChange);
+            getMapPanel().getRoadMap().refreshListeners();
             getMapPanel().repaint();
             setStale(true);
         }

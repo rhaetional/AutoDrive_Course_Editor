@@ -4,6 +4,7 @@ import AutoDriveEditor.GUI.Buttons.BaseButton;
 import AutoDriveEditor.Managers.ChangeManager;
 import AutoDriveEditor.MapPanel.MapPanel;
 import AutoDriveEditor.RoadNetwork.MapNode;
+import AutoDriveEditor.RoadNetwork.RoadMap;
 
 import javax.swing.*;
 import java.awt.event.MouseEvent;
@@ -174,6 +175,7 @@ public class MoveNodeButton extends BaseButton {
             }
         }
         canAutoSave = true;
+        getMapPanel().getRoadMap().refreshListeners();
         getMapPanel().repaint();
     }
 
@@ -203,6 +205,7 @@ public class MoveNodeButton extends BaseButton {
             for (MapNode node : this.moveNodes) {
                 checkAreaForNodeOverlap(node);
             }
+            getMapPanel().getRoadMap().refreshListeners();
             getMapPanel().repaint();
             setStale(this.isStale);
         }
@@ -212,6 +215,7 @@ public class MoveNodeButton extends BaseButton {
             for (MapNode node : this.moveNodes) {
                 checkAreaForNodeOverlap(node);
             }
+            getMapPanel().getRoadMap().refreshListeners();
             getMapPanel().repaint();
             setStale(true);
         }

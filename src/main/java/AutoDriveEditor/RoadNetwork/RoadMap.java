@@ -68,6 +68,21 @@ public class RoadMap {
         return new MapNode(-99, x, 0, z, NODE_FLAG_STANDARD, false, true);
     }
 
+    public static void addMapNode(MapNode newNode) {
+        networkNodesList.add(newNode);
+        pcs.firePropertyChange("networkNodesList.add", null,newNode);
+    }
+
+    public static void addAll(LinkedList<MapNode> nodes) {
+        networkNodesList.addAll(nodes);
+        pcs.firePropertyChange("networkNodesList.addAll", null, nodes);
+    }
+
+    public static void removeAll(LinkedList<MapNode> nodes) {
+        networkNodesList.removeAll(nodes);
+        pcs.firePropertyChange("networkNodesList.removeAll", nodes, null);
+    }
+
     public void insertMapNode(MapNode toAdd, LinkedList<MapNode> otherNodesInList, LinkedList<MapNode> otherNodesOutList) {
 
         // starting at the index of where we need to insert the node
@@ -134,6 +149,6 @@ public class RoadMap {
     }
 
     public void refreshListeners() {
-        pcs.firePropertyChange("networkNodesList.refreshList", networkNodesList, networkNodesList);
+        pcs.firePropertyChange("networkNodesList.refreshList", null, networkNodesList);
     }
 }

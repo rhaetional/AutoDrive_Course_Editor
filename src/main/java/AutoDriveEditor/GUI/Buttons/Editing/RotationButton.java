@@ -105,6 +105,7 @@ public final class RotationButton extends BaseButton {
         super.mouseDragged(e);
         if (isControlNodeSelected) {
             totalAngle += rotation.rotateControlNode(e.getX(), e.getY(), 0);
+            getMapPanel().getRoadMap().refreshListeners();
             getMapPanel().repaint();
         }
     }
@@ -120,7 +121,6 @@ public final class RotationButton extends BaseButton {
                 rotation.setInitialControlNodePosition(multiSelectList);
                 displayedRadius = rotation.getSelectionRadius(multiSelectList);
             }
-
         }
     }
 
@@ -216,6 +216,7 @@ public final class RotationButton extends BaseButton {
         public void undo(){
             //rotation.setCentrePointWorld(this.centrePointWorld);
             rotation.rotateChanger(this.storedRotateNodeList, this.centrePointWorld, -this.angle);
+            getMapPanel().getRoadMap().refreshListeners();
             getMapPanel().repaint();
             setStale(this.isStale);
         }
@@ -223,6 +224,7 @@ public final class RotationButton extends BaseButton {
         public void redo(){
             rotation.setCentrePointWorld(this.centrePointWorld);
             rotation.rotateChanger(this.storedRotateNodeList, this.centrePointWorld, this.angle);
+            getMapPanel().getRoadMap().refreshListeners();
             getMapPanel().repaint();
             setStale(true);
         }

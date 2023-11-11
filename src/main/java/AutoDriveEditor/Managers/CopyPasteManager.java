@@ -187,7 +187,7 @@ public class CopyPasteManager {
                 if (yValue != -1) node.y = yValue;
             }
             node.isSelected = true;
-            RoadMap.networkNodesList.add(node);
+            RoadMap.addMapNode(node);
             checkNodeOverlap(node);
             multiSelectList.add(node);
         }
@@ -198,6 +198,7 @@ public class CopyPasteManager {
 
         changeManager.addChangeable( new PasteSelectionButton.PasteSelectionChanger(newNodes) );
         setStale(true);
+        getMapPanel().getRoadMap().refreshListeners();
         getMapPanel().repaint();
     }
 

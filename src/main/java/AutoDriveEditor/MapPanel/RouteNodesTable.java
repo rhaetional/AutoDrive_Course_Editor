@@ -30,7 +30,7 @@ import static AutoDriveEditor.Utils.LoggerUtils.LOG;
 public class RouteNodesTable extends JPanel implements PropertyChangeListener {
     private final RouteNodesTableModel tableModel;
     // Debug privately for now
-    private final boolean bDebugRouteNodesTable = true;
+    private final boolean bDebugRouteNodesTable = false;
 
     public RouteNodesTable() {
 
@@ -81,6 +81,16 @@ public class RouteNodesTable extends JPanel implements PropertyChangeListener {
         if (Objects.equals(evt.getPropertyName(), "networkNodesList.add")) {
             tableModel.addNode((MapNode) evt.getNewValue());
         }
+        if (Objects.equals(evt.getPropertyName(), "networkNodesList.removeAll")) {
+            for (MapNode node : (LinkedList<MapNode>) evt.getOldValue()) {
+                tableModel.removeNode(node);
+            }
+        }
+        if (Objects.equals(evt.getPropertyName(), "networkNodesList.addAll")) {
+            for (MapNode node : (LinkedList<MapNode>) evt.getNewValue()) {
+                tableModel.addNode(node);
+            }
+        }
         if (Objects.equals(evt.getPropertyName(), "networkNodesList.replaceList")) {
             // clear existing rows
             if (evt.getOldValue() != null) {
@@ -91,7 +101,8 @@ public class RouteNodesTable extends JPanel implements PropertyChangeListener {
             }
         }
         if (Objects.equals(evt.getPropertyName(), "networkNodesList.refreshList")) {
-                tableModel.fireTableDataChanged();
+            //tableModel.fireTableDataChanged();
+                tableModel.updateAllNodes();
         }
     }
 
