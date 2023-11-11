@@ -1,21 +1,18 @@
 package AutoDriveEditor.MapPanel;
 // Packages to import
 
-import AutoDriveEditor.RoadNetwork.*;
+import AutoDriveEditor.RoadNetwork.MapNode;
 
 import javax.swing.*;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.AbstractTableModel;
-import javax.swing.table.TableModel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.LinkedList;
-import java.util.List;
-import java.util.Objects;
 import java.util.Vector;
 
 import static AutoDriveEditor.GUI.GUIBuilder.routeNodesTable;
@@ -61,6 +58,7 @@ public class RouteNodesTable extends JPanel implements PropertyChangeListener {
     }
 
     public void unloadRoadMap() {
+        // TODO: TableModel: This can probably be simplified / make use of  tableModel.fireTableRowsDeleted(0,tableModel.getRowCount()-1);
         tableModel.removeAllNodes();
     }
 
@@ -72,40 +70,56 @@ public class RouteNodesTable extends JPanel implements PropertyChangeListener {
      */
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
-        if (bDebugRouteNodesTable)
+        if (bDebugRouteNodesTable) {
             LOG.info("## bDebugRouteNodesTable ## Variation of {}\t\t({}\t->\t{})\t\tProperty in object {}", evt.getPropertyName(), evt.getOldValue(), evt.getNewValue(), evt.getSource());
+        }
 
-        if (Objects.equals(evt.getPropertyName(), "networkNodesList.remove")) {
-            tableModel.removeNode((MapNode) evt.getOldValue());
-        }
-        if (Objects.equals(evt.getPropertyName(), "networkNodesList.add")) {
-            tableModel.addNode((MapNode) evt.getNewValue());
-        }
-        if (Objects.equals(evt.getPropertyName(), "networkNodesList.removeAll")) {
-            for (MapNode node : (LinkedList<MapNode>) evt.getOldValue()) {
-                tableModel.removeNode(node);
-            }
-        }
-        if (Objects.equals(evt.getPropertyName(), "networkNodesList.addAll")) {
-            for (MapNode node : (LinkedList<MapNode>) evt.getNewValue()) {
-                tableModel.addNode(node);
-            }
-        }
-        if (Objects.equals(evt.getPropertyName(), "networkNodesList.replaceList")) {
-            // clear existing rows
-            if (evt.getOldValue() != null) {
-                unloadRoadMap();
-            }
-            if ((evt.getNewValue() != null) && (evt.getNewValue() instanceof LinkedList<?>)) {
-                loadRoadMap((LinkedList<MapNode>) evt.getNewValue());
-            }
-        }
-        if (Objects.equals(evt.getPropertyName(), "networkNodesList.refreshList")) {
-            //tableModel.fireTableDataChanged();
+        switch (evt.getPropertyName()) {
+            case "networkNodesList.remove":
+                tableModel.removeNode((MapNode) evt.getOldValue());
+                break;
+            case "networkNodesList.add":
+                tableModel.addNode((MapNode) evt.getNewValue());
+                break;
+            case "networkNodesList.removeAll":
+                for (MapNode node : safeCastToLinkedListMapNode(evt.getOldValue())) {
+                    tableModel.removeNode(node);
+                }
+                break;
+            case "networkNodesList.addAll":
+                for (MapNode node : safeCastToLinkedListMapNode(evt.getNewValue())) {
+                    tableModel.addNode(node);
+                }
+                break;
+            case "networkNodesList.replaceList":
+                // clear existing rows
+                if (evt.getOldValue() != null) {
+                    unloadRoadMap();
+                }
+                if (evt.getNewValue() != null) {
+                    loadRoadMap(safeCastToLinkedListMapNode(evt.getNewValue()));
+                }
+                break;
+            case "networkNodesList.refreshList":
                 tableModel.updateAllNodes();
+                break;
+            default:
+                LOG.warn("## bDebugRouteNodesTable ## Unhandled Property change for variation of {}\t\t({}\t->\t{})\t\tProperty in object {}", evt.getPropertyName(), evt.getOldValue(), evt.getNewValue(), evt.getSource());
+                break;
         }
     }
 
+    @SuppressWarnings("unchecked")
+    private static LinkedList<MapNode> safeCastToLinkedListMapNode(Object unknownObject) {
+        if (unknownObject instanceof LinkedList) {
+            LinkedList<?> unknownList = (LinkedList<?>) unknownObject;
+            if (!unknownList.isEmpty() && unknownList.get(0) instanceof MapNode) {
+                return (LinkedList<MapNode>) unknownList;
+            }
+        }
+        // Object of different type or LL is empty
+        return null;
+    }
 
     /**
      * Table Model mapping MapNode to rows
@@ -132,8 +146,7 @@ public class RouteNodesTable extends JPanel implements PropertyChangeListener {
             nodeRows.add(node);
 
             // Event to create row at index
-            TableModelEvent e = new TableModelEvent(this, index, index,
-                    TableModelEvent.ALL_COLUMNS, TableModelEvent.INSERT);
+            TableModelEvent e = new TableModelEvent(this, index, index, TableModelEvent.ALL_COLUMNS, TableModelEvent.INSERT);
 
             // Send the event
             for (TableModelListener listener : listeners) {
@@ -225,7 +238,7 @@ public class RouteNodesTable extends JPanel implements PropertyChangeListener {
                     node.setMarkerGroup((String) aValue);
                     break;
                 case 6:
-                    node.setParkedVehiclesList((List<Integer>) aValue);
+                    node.setParkedVehiclesList(safeCastToLinkedListInteger(aValue));
                     break;
             }
         }
@@ -234,6 +247,18 @@ public class RouteNodesTable extends JPanel implements PropertyChangeListener {
         @Override
         public void fireTableDataChanged() {
             super.fireTableDataChanged();
+        }
+
+        @SuppressWarnings("unchecked")
+        private static LinkedList<Integer> safeCastToLinkedListInteger(Object unknownObject) {
+            if (unknownObject instanceof LinkedList) {
+                LinkedList<?> unknownList = (LinkedList<?>) unknownObject;
+                if (!unknownList.isEmpty() && unknownList.get(0) instanceof Integer) {
+                    return (LinkedList<Integer>) unknownList;
+                }
+            }
+            // Object of different type or LL is empty
+            return null;
         }
 
         public Class getColumnClass(int columnIndex) {
@@ -266,10 +291,8 @@ public class RouteNodesTable extends JPanel implements PropertyChangeListener {
         }
 
         public boolean isCellEditable(int rowIndex, int columnIndex) {
-            if (columnIndex == 0)
-                return false;
-            else
-                return true;
+            // columns 0 and 6 are read-only
+            return (columnIndex != 0) && (columnIndex != 6);
         }
 
     }
