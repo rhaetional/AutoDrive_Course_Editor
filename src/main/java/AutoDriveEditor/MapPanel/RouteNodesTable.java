@@ -7,6 +7,7 @@ import javax.swing.*;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.AbstractTableModel;
+import javax.swing.table.TableRowSorter;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -25,7 +26,9 @@ import static AutoDriveEditor.Utils.LoggerUtils.LOG;
  * changes to the networkNodesList
  */
 public class RouteNodesTable extends JPanel implements PropertyChangeListener {
+    private static boolean markerFilterActive = false;
     private final RouteNodesTableModel tableModel;
+    private final JTable table;
     // Debug privately for now
     private final boolean bDebugRouteNodesTable = false;
 
@@ -33,15 +36,21 @@ public class RouteNodesTable extends JPanel implements PropertyChangeListener {
 
         this.setLayout(new BorderLayout());
         tableModel = new RouteNodesTableModel();
-        JTable nodesTable = new JTable(tableModel);
-        nodesTable.setAutoCreateRowSorter(true);
+        table = new JTable(tableModel);
 
-        JScrollPane scrollPane = new JScrollPane(nodesTable);
+
+        table.setAutoCreateRowSorter(true);
+
+        JScrollPane scrollPane = new JScrollPane(table);
         this.add(scrollPane, BorderLayout.CENTER);
 
         JButton buttonUpdate = new JButton("Update");
         buttonUpdate.addActionListener(new UpdateButtonListener());
         this.add(buttonUpdate, BorderLayout.SOUTH);
+
+        JButton buttonFilter = new JButton("Toggle Filter on Marker");
+        buttonFilter.addActionListener(new FilterButtonListener());
+        this.add(buttonFilter, BorderLayout.NORTH);
     }
 
     public static RouteNodesTable getRouteNodesTable() {
@@ -58,7 +67,11 @@ public class RouteNodesTable extends JPanel implements PropertyChangeListener {
     }
 
     public void unloadRoadMap() {
-        // TODO: TableModel: This can probably be simplified / make use of  tableModel.fireTableRowsDeleted(0,tableModel.getRowCount()-1);
+        // clear active sorter and filter
+        if (table.getRowSorter() != null) {
+            toggleMarkerFilter();
+        }
+
         tableModel.removeAllNodes();
     }
 
@@ -121,12 +134,35 @@ public class RouteNodesTable extends JPanel implements PropertyChangeListener {
         return null;
     }
 
+    private void toggleMarkerFilter() {
+        if (markerFilterActive) {
+            table.setRowSorter(null);
+        } else {
+            TableRowSorter<RouteNodesTableModel> sorter = new TableRowSorter<>(tableModel);
+            sorter.setRowFilter(new RowFilter<RouteNodesTableModel, Integer>() {
+                @Override
+                public boolean include(RowFilter.Entry<? extends RouteNodesTableModel, ? extends Integer> entry) {
+                    boolean included = true;
+                    Object cellValue = entry.getModel().getValueAt(entry.getIdentifier(), 4);
+                    if (cellValue == null || cellValue.toString().trim().isEmpty()) {
+                        included = false;
+                    }
+                    return included;
+                }
+            });
+            table.setRowSorter(sorter);
+        }
+
+        // toggle flag
+        markerFilterActive = !markerFilterActive;
+    }
+
     /**
      * Table Model mapping MapNode to rows
      */
     static class RouteNodesTableModel extends AbstractTableModel {
-        private final Vector<MapNode> nodeRows = new Vector<>();
-        private final String[] columnNames = {
+        private final Vector<MapNode> data = new Vector<>();
+        private final String[] columns = {
                 "Node ID",
                 "X",
                 "Y",
@@ -142,8 +178,8 @@ public class RouteNodesTable extends JPanel implements PropertyChangeListener {
         public void addNode(MapNode node) {
 
             // new row index
-            int index = nodeRows.size();
-            nodeRows.add(node);
+            int index = data.size();
+            data.add(node);
 
             // Event to create row at index
             TableModelEvent e = new TableModelEvent(this, index, index, TableModelEvent.ALL_COLUMNS, TableModelEvent.INSERT);
@@ -158,54 +194,58 @@ public class RouteNodesTable extends JPanel implements PropertyChangeListener {
          * @param mapNode
          */
         public void removeNode(MapNode mapNode) {
-            int rowIndex = nodeRows.indexOf(mapNode);
-            nodeRows.remove(rowIndex);
+            int rowIndex = data.indexOf(mapNode);
+            data.remove(rowIndex);
 
             // Fire a table model event to notify listeners that the data has changed
             TableModelEvent e = new TableModelEvent(this, rowIndex, rowIndex, TableModelEvent.ALL_COLUMNS, TableModelEvent.DELETE);
             for (TableModelListener listener : listeners) {
                 listener.tableChanged(e);
             }
+
+            //fireTableRowsDeleted(rowIndex, rowIndex);
         }
 
         public void updateNode(MapNode mapNode) {
-            int rowIndex = nodeRows.indexOf(mapNode);
+            int rowIndex = data.indexOf(mapNode);
             // Fire a table model event to notify listeners that the data has changed
             TableModelEvent e = new TableModelEvent(this, rowIndex, rowIndex, TableModelEvent.ALL_COLUMNS, TableModelEvent.UPDATE);
             for (TableModelListener listener : listeners) {
                 listener.tableChanged(e);
             }
+            //fireTableRowsUpdated(rowIndex,rowIndex);
         }
 
         public void removeAllNodes() {
-            synchronized (nodeRows) {
-                nodeRows.removeAllElements();
-            }
+            data.clear();
+            fireTableDataChanged();
         }
 
+        // TODO: Can this function be replaced by fireTableDataChanged();?
         public void updateAllNodes() {
-            int maxIndex = nodeRows.size() - 1;
+            int maxIndex = data.size() - 1;
             TableModelEvent e = new TableModelEvent(this, 0, maxIndex, TableModelEvent.ALL_COLUMNS, TableModelEvent.UPDATE);
             for (TableModelListener listener : listeners) {
                 listener.tableChanged(e);
             }
+            //fireTableDataChanged();
         }
 
         public int getColumnCount() {
-            return columnNames.length;
+            return columns.length;
         }
 
         public int getRowCount() {
-            return nodeRows.size();
+            return data.size();
         }
 
         public String getColumnName(int column) {
-            return columnNames[column];
+            return columns[column];
         }
 
         @Override
         public Object getValueAt(int rowIndex, int columnIndex) {
-            MapNode node = nodeRows.get(rowIndex);
+            MapNode node = data.get(rowIndex);
 
             switch (columnIndex) {
                 case 0:
@@ -229,7 +269,7 @@ public class RouteNodesTable extends JPanel implements PropertyChangeListener {
 
         @Override
         public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
-            MapNode node = nodeRows.get(rowIndex);
+            MapNode node = data.get(rowIndex);
             switch (columnIndex) {
                 case 4:
                     node.setMarkerName((String) aValue);
@@ -241,12 +281,6 @@ public class RouteNodesTable extends JPanel implements PropertyChangeListener {
                     node.setParkedVehiclesList(safeCastToLinkedListInteger(aValue));
                     break;
             }
-        }
-
-        //TODO: This does not seem to work. Revert to TableModel?
-        @Override
-        public void fireTableDataChanged() {
-            super.fireTableDataChanged();
         }
 
         @SuppressWarnings("unchecked")
@@ -294,7 +328,6 @@ public class RouteNodesTable extends JPanel implements PropertyChangeListener {
             // columns 0 and 6 are read-only
             return (columnIndex != 0) && (columnIndex != 6);
         }
-
     }
 
     /**
@@ -306,4 +339,9 @@ public class RouteNodesTable extends JPanel implements PropertyChangeListener {
         }
     }
 
+    private class FilterButtonListener implements ActionListener {
+        public void actionPerformed(ActionEvent e) {
+            toggleMarkerFilter();
+        }
+    }
 }
