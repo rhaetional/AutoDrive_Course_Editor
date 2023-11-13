@@ -221,7 +221,7 @@ public class RouteNodesTable extends JPanel implements PropertyChangeListener {
             fireTableDataChanged();
         }
 
-        // TODO: Can this function be replaced by fireTableDataChanged();?
+        // TODO: Why doesn't fireTableDataChanged() work here?
         public void updateAllNodes() {
             int maxIndex = data.size() - 1;
             TableModelEvent e = new TableModelEvent(this, 0, maxIndex, TableModelEvent.ALL_COLUMNS, TableModelEvent.UPDATE);
