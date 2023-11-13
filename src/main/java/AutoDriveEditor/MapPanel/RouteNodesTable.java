@@ -295,7 +295,7 @@ public class RouteNodesTable extends JPanel implements PropertyChangeListener {
             return null;
         }
 
-        public Class getColumnClass(int columnIndex) {
+        public Class<?> getColumnClass(int columnIndex) {
             switch (columnIndex) {
                 case 0:
                     return Integer.class;
