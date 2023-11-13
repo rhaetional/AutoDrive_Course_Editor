@@ -6,8 +6,7 @@ import AutoDriveEditor.RoadNetwork.MapNode;
 import javax.swing.*;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
-import javax.swing.table.AbstractTableModel;
-import javax.swing.table.TableRowSorter;
+import javax.swing.table.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -29,16 +28,18 @@ public class RouteNodesTable extends JPanel implements PropertyChangeListener {
     private static boolean markerFilterActive = false;
     private final RouteNodesTableModel tableModel;
     private final JTable table;
+    private final ColumnWidthManager columnWidthManager;
     // Debug privately for now
-    private final boolean bDebugRouteNodesTable = false;
+    private final boolean bDebugRouteNodesTable = true; //TODO: Disable
 
     public RouteNodesTable() {
 
         this.setLayout(new BorderLayout());
         tableModel = new RouteNodesTableModel();
         table = new JTable(tableModel);
+        columnWidthManager = new ColumnWidthManager();
 
-
+        table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
         table.setAutoCreateRowSorter(true);
 
         JScrollPane scrollPane = new JScrollPane(table);
@@ -63,6 +64,7 @@ public class RouteNodesTable extends JPanel implements PropertyChangeListener {
             for (MapNode node : roadList) {
                 tableModel.addNode(node);
             }
+            columnWidthManager.packColumns();
         }
     }
 
@@ -73,10 +75,17 @@ public class RouteNodesTable extends JPanel implements PropertyChangeListener {
         }
 
         tableModel.removeAllNodes();
+        columnWidthManager.packColumns();
+    }
+
+    public void refreshRoadMap() {
+        tableModel.updateAllNodes();
+        columnWidthManager.packColumns();
     }
 
     /**
      * This method gets called when a bound property is changed.
+     * TODO: Delegate logic to utility functions like loadRoadMap() or unloadRoadMap()
      *
      * @param evt A PropertyChangeEvent object describing the event source
      *            and the property that has changed.
@@ -90,19 +99,23 @@ public class RouteNodesTable extends JPanel implements PropertyChangeListener {
         switch (evt.getPropertyName()) {
             case "networkNodesList.remove":
                 tableModel.removeNode((MapNode) evt.getOldValue());
+                columnWidthManager.packColumns();
                 break;
             case "networkNodesList.add":
                 tableModel.addNode((MapNode) evt.getNewValue());
+                columnWidthManager.updateMaxColumnWidth(tableModel.getRowCount()-1);
                 break;
             case "networkNodesList.removeAll":
                 for (MapNode node : safeCastToLinkedListMapNode(evt.getOldValue())) {
                     tableModel.removeNode(node);
                 }
+                columnWidthManager.packColumns();
                 break;
             case "networkNodesList.addAll":
                 for (MapNode node : safeCastToLinkedListMapNode(evt.getNewValue())) {
                     tableModel.addNode(node);
                 }
+                columnWidthManager.packColumns();
                 break;
             case "networkNodesList.replaceList":
                 // clear existing rows
@@ -114,7 +127,7 @@ public class RouteNodesTable extends JPanel implements PropertyChangeListener {
                 }
                 break;
             case "networkNodesList.refreshList":
-                tableModel.updateAllNodes();
+                refreshRoadMap();
                 break;
             default:
                 LOG.warn("## bDebugRouteNodesTable ## Unhandled Property change for variation of {}\t\t({}\t->\t{})\t\tProperty in object {}", evt.getPropertyName(), evt.getOldValue(), evt.getNewValue(), evt.getSource());
@@ -331,11 +344,84 @@ public class RouteNodesTable extends JPanel implements PropertyChangeListener {
     }
 
     /**
+     * Maintains Column widths based on content.
+     * Needs to be re-initialised, if columns are dynamically added to the model
+     */
+    private class ColumnWidthManager {
+        Integer[] columnWidths;
+        int padding = 5;
+
+        public ColumnWidthManager() {
+            columnWidths = new Integer[tableModel.getColumnCount()];
+            packColumns();
+        }
+        public void packColumns() {
+            int tableWidth = 0;
+
+            for (int column = 0; column < columnWidths.length; column++) {
+                TableColumn tableColumn = table.getColumnModel().getColumn(column);
+                int preferredWidth = 15; // Set a minimum width
+
+                for (int row = 0; row < table.getRowCount(); row++) {
+                    TableCellRenderer renderer = table.getCellRenderer(row, column);
+                    Component comp = table.prepareRenderer(renderer, row, column);
+                    preferredWidth = Math.max(comp.getPreferredSize().width + padding, preferredWidth);
+                }
+
+                // Min Width = header width
+                preferredWidth = Math.max(preferredWidth, getColumnHeaderWidth(tableColumn));
+
+                // Max Width
+                if(preferredWidth > 300)
+                    preferredWidth=300;
+
+                columnWidths[column] = preferredWidth;
+                table.getColumnModel().getColumn(column).setPreferredWidth(preferredWidth);
+
+                tableWidth += preferredWidth;
+                // LOG.info("ColumnWidthManager.packColumns(): Column id {}\tWIDTH: calculated {}\tmin {}\tpref {}\tmax {}\tactual {}", tableColumn.getIdentifier(), preferredWidth, tableColumn.getMinWidth(),tableColumn.getPreferredWidth(),tableColumn.getMaxWidth(),tableColumn.getWidth());
+
+            }
+            LOG.info("ColumnWidthManager.packColumns(): Table WIDTH: calculated {}\tmin {}\tpref {}\tmax {}\tactual {}",tableWidth,table.getMinimumSize().width,table.getPreferredSize().width,table.getMaximumSize().width,table.getSize().width);
+        }
+        public void updateMaxColumnWidth(int row) {
+
+            for (int column = 0; column < columnWidths.length; column++) {
+                TableColumn tableColumn = table.getColumnModel().getColumn(column);
+                int newColumnWidth = 15; // Set a minimum width
+
+                TableCellRenderer renderer = table.getCellRenderer(row, column);
+                Component comp = table.prepareRenderer(renderer, row, column);
+                newColumnWidth = Math.max(comp.getPreferredSize().width + padding, newColumnWidth);
+
+                // Min Width = header width
+                newColumnWidth = Math.max(newColumnWidth, getColumnHeaderWidth(tableColumn));
+
+                // Max Width
+                if (newColumnWidth > 300)
+                    newColumnWidth = 300;
+
+                if (newColumnWidth > columnWidths[column]) {
+                    columnWidths[column] = newColumnWidth;
+                    table.getColumnModel().getColumn(column).setPreferredWidth(newColumnWidth);
+                }
+            }
+        }
+        private int getColumnHeaderWidth(TableColumn col) {
+            TableCellRenderer renderer = table.getTableHeader().getDefaultRenderer();
+
+            Component comp = renderer.getTableCellRendererComponent(table,
+                    col.getHeaderValue(), false, false, 0, 0);
+            return comp.getPreferredSize().width;
+        }
+    }
+
+    /**
      * Action Listener
      */
     private class UpdateButtonListener implements ActionListener {
         public void actionPerformed(ActionEvent e) {
-            tableModel.updateAllNodes();
+            refreshRoadMap();
         }
     }
 
