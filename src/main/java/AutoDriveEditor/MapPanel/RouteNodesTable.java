@@ -360,7 +360,10 @@ public class RouteNodesTable extends JPanel implements PropertyChangeListener {
 
         public boolean isCellEditable(int rowIndex, int columnIndex) {
             // columns 0 and 6 are read-only
-            return (columnIndex != 0) && (columnIndex != 6);
+            // return (columnIndex != 0) && (columnIndex != 6);
+
+            // disable editing until changes are updated to the model.
+            return false;
         }
     }
 
