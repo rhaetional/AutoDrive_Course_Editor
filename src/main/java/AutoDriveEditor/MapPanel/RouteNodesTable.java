@@ -8,8 +8,7 @@ import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import java.awt.event.*;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.*;
@@ -52,6 +51,8 @@ public class RouteNodesTable extends JPanel implements PropertyChangeListener {
 
         filterButtonPanel = new FilterButtonPanel();
         this.add(filterButtonPanel, BorderLayout.NORTH);
+
+        table.addMouseListener(new TableMouseAdapter());
     }
 
     public static RouteNodesTable getRouteNodesTable() {
@@ -189,12 +190,12 @@ public class RouteNodesTable extends JPanel implements PropertyChangeListener {
 
         } else {
             // order as defined in table model
-            for (int i=0; i < columnCount; i++) {
+            for (int i = 0; i < columnCount; i++) {
                 columnOrder[i] = tableModel.getColumnName(i);
             }
         }
 
-        for (int i=0; i < columnCount; i++) {
+        for (int i = 0; i < columnCount; i++) {
             int currIndex = columnModel.getColumnIndex(columnOrder[i]);
             if (i != currIndex)
                 columnModel.moveColumn(currIndex, i);
@@ -265,6 +266,20 @@ public class RouteNodesTable extends JPanel implements PropertyChangeListener {
             }
 
             //fireTableRowsDeleted(rowIndex, rowIndex);
+        }
+
+        public MapNode getMapNodeById(int mapNodeID) {
+            MapNode mapNode = data.get(mapNodeID - 1);
+            if (mapNode.id != mapNodeID) {
+                for (MapNode n : data) {
+                    if (n.id == mapNodeID) {
+                        mapNode = n;
+                        break;
+                    }
+                }
+            }
+
+            return mapNode;
         }
 
         public void updateNode(MapNode mapNode) {
@@ -520,7 +535,7 @@ public class RouteNodesTable extends JPanel implements PropertyChangeListener {
         /**
          * Set or update the current filter
          *
-         * @param filterType    Identifies the filter to be set, enumerated in FILTER_*
+         * @param filterType Identifies the filter to be set, enumerated in FILTER_*
          */
         public void setSelectedFilter(int filterType) {
             Enumeration<AbstractButton> buttons = filterButtonGroup.getElements();
@@ -539,11 +554,13 @@ public class RouteNodesTable extends JPanel implements PropertyChangeListener {
          */
         private class FilterButton extends JRadioButton {
             protected final int filterType;
+
             public FilterButton(String text, int filterType) {
                 super(text);
                 this.filterType = filterType;
             }
-            public void addActionListener (FilterButtonListener l) {
+
+            public void addActionListener(FilterButtonListener l) {
                 l.setFilterType(filterType);
                 super.addActionListener(l);
             }
@@ -555,9 +572,11 @@ public class RouteNodesTable extends JPanel implements PropertyChangeListener {
         // Todo: Can't we do without storing the filtertype here?
         private class FilterButtonListener implements ActionListener {
             private int filterType = -1;
+
             public void setFilterType(int newFilterType) {
                 filterType = newFilterType;
             }
+
             public int getFilterType() {
                 return filterType;
             }
@@ -579,4 +598,63 @@ public class RouteNodesTable extends JPanel implements PropertyChangeListener {
         }
     }
 
+    private class TableMouseAdapter implements MouseListener {
+        @Override
+        public void mouseClicked(MouseEvent e) {
+            // If the double-clicked row contains a MapNode, get it
+            if (e.getClickCount() == 2) {
+                int row = table.getSelectedRow();
+                if (row >= 0) {
+                    int mapNodeId = (int) table.getValueAt(row, 0);
+                    MapNode mapNode = tableModel.getMapNodeById(mapNodeId);
+                    SwingUtilities.invokeLater(new Runnable() {
+                        @Override
+                        public void run() {
+                            MapPanel.centreNodeInMapPanel(mapNode);
+                        }
+                    });
+                }
+            }
+        }
+
+        /**
+         * Invoked when a mouse button has been pressed on a component.
+         *
+         * @param e the event to be processed
+         */
+        @Override
+        public void mousePressed(MouseEvent e) {
+
+        }
+
+        /**
+         * Invoked when a mouse button has been released on a component.
+         *
+         * @param e the event to be processed
+         */
+        @Override
+        public void mouseReleased(MouseEvent e) {
+
+        }
+
+        /**
+         * Invoked when the mouse enters a component.
+         *
+         * @param e the event to be processed
+         */
+        @Override
+        public void mouseEntered(MouseEvent e) {
+
+        }
+
+        /**
+         * Invoked when the mouse exits a component.
+         *
+         * @param e the event to be processed
+         */
+        @Override
+        public void mouseExited(MouseEvent e) {
+
+        }
+    }
 }
