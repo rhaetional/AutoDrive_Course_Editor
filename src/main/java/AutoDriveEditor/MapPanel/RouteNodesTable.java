@@ -12,8 +12,10 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.Enumeration;
 import java.util.LinkedList;
 import java.util.Vector;
+import java.util.stream.Collectors;
 
 import static AutoDriveEditor.GUI.GUIBuilder.routeNodesTable;
 import static AutoDriveEditor.Utils.LoggerUtils.LOG;
@@ -30,7 +32,7 @@ public class RouteNodesTable extends JPanel implements PropertyChangeListener {
     private final ColumnWidthManager columnWidthManager;
     private final FilterButtonPanel filterButtonPanel;
     // Debug privately for now
-    private final boolean bDebugRouteNodesTable = true; //TODO: Disable
+    private final boolean bDebugRouteNodesTable = false;
 
     public RouteNodesTable() {
 
@@ -103,7 +105,7 @@ public class RouteNodesTable extends JPanel implements PropertyChangeListener {
                 break;
             case "networkNodesList.add":
                 tableModel.addNode((MapNode) evt.getNewValue());
-                columnWidthManager.updateMaxColumnWidth(tableModel.getRowCount()-1);
+                columnWidthManager.updateMaxColumnWidth(tableModel.getRowCount() - 1);
                 break;
             case "networkNodesList.removeAll":
                 for (MapNode node : safeCastToLinkedListMapNode(evt.getOldValue())) {
@@ -159,7 +161,7 @@ public class RouteNodesTable extends JPanel implements PropertyChangeListener {
                 table.setRowSorter(getFilterColumnNotEmpty(4));
                 break;
             case FilterButtonPanel.FILTER_PARKING:
-                table.setRowSorter(getFilterColumnNotEmpty(5));
+                table.setRowSorter(getFilterColumnNotEmpty(6));
                 break;
             default:
                 break;
@@ -286,7 +288,14 @@ public class RouteNodesTable extends JPanel implements PropertyChangeListener {
                 case 5:
                     return node.hasMapMarker() ? node.getMarkerGroup() : "";
                 case 6:
-                    return node.isParkDestination() ? node.getParkedVehiclesList().toString() : "";
+                    LinkedList<Integer> list = safeCastToLinkedListInteger(node);
+                    if (list != null) {
+                        return list.stream()
+                                .map(Object::toString)
+                                .collect(Collectors.joining(", "));
+                    } else {
+                        return null;
+                    }
                 default:
                     return null;
             }
@@ -367,6 +376,7 @@ public class RouteNodesTable extends JPanel implements PropertyChangeListener {
             columnWidths = new Integer[tableModel.getColumnCount()];
             packColumns();
         }
+
         public void packColumns() {
             int tableWidth = 0;
 
@@ -384,8 +394,8 @@ public class RouteNodesTable extends JPanel implements PropertyChangeListener {
                 preferredWidth = Math.max(preferredWidth, getColumnHeaderWidth(tableColumn));
 
                 // Max Width
-                if(preferredWidth > 300)
-                    preferredWidth=300;
+                if (preferredWidth > 300)
+                    preferredWidth = 300;
 
                 columnWidths[column] = preferredWidth;
                 table.getColumnModel().getColumn(column).setPreferredWidth(preferredWidth);
@@ -394,8 +404,9 @@ public class RouteNodesTable extends JPanel implements PropertyChangeListener {
                 // LOG.info("ColumnWidthManager.packColumns(): Column id {}\tWIDTH: calculated {}\tmin {}\tpref {}\tmax {}\tactual {}", tableColumn.getIdentifier(), preferredWidth, tableColumn.getMinWidth(),tableColumn.getPreferredWidth(),tableColumn.getMaxWidth(),tableColumn.getWidth());
 
             }
-            LOG.info("ColumnWidthManager.packColumns(): Table WIDTH: calculated {}\tmin {}\tpref {}\tmax {}\tactual {}",tableWidth,table.getMinimumSize().width,table.getPreferredSize().width,table.getMaximumSize().width,table.getSize().width);
+            LOG.info("ColumnWidthManager.packColumns(): Table WIDTH: calculated {}\tmin {}\tpref {}\tmax {}\tactual {}", tableWidth, table.getMinimumSize().width, table.getPreferredSize().width, table.getMaximumSize().width, table.getSize().width);
         }
+
         public void updateMaxColumnWidth(int row) {
 
             for (int column = 0; column < columnWidths.length; column++) {
@@ -419,6 +430,7 @@ public class RouteNodesTable extends JPanel implements PropertyChangeListener {
                 }
             }
         }
+
         private int getColumnHeaderWidth(TableColumn col) {
             TableCellRenderer renderer = table.getTableHeader().getDefaultRenderer();
 
@@ -428,6 +440,9 @@ public class RouteNodesTable extends JPanel implements PropertyChangeListener {
         }
     }
 
+    /**
+     * Class to encapsulate the FilterPanel and its "Filter States"
+     */
     private class FilterButtonPanel extends JPanel {
         // Filter states (enum not allowed for inner class at language level 11)
         public static final int FILTER_CLEAR = -1;
@@ -436,19 +451,20 @@ public class RouteNodesTable extends JPanel implements PropertyChangeListener {
         public static final int FILTER_PARKING = 2;
 
         protected int activeFilter = FILTER_CLEAR;
+        private ButtonGroup filterButtonGroup;
 
 
-        public FilterButtonPanel(){
-            ButtonGroup filterGroup = new ButtonGroup();
+        public FilterButtonPanel() {
+            filterButtonGroup = new ButtonGroup();
 
-            JRadioButton showAll = new JRadioButton("Show All");
-            JRadioButton showMarkers = new JRadioButton("Show Markers");
-            JRadioButton showParking = new JRadioButton("Show Parking");
+            FilterButton showAll = new FilterButton("Show All", FILTER_ALL);
+            FilterButton showMarkers = new FilterButton("Show Markers", FILTER_MARKERS);
+            FilterButton showParking = new FilterButton("Show Parking", FILTER_PARKING);
 
             // Add radio buttons to the button group
-            filterGroup.add(showAll);
-            filterGroup.add(showMarkers);
-            filterGroup.add(showParking);
+            filterButtonGroup.add(showAll);
+            filterButtonGroup.add(showMarkers);
+            filterButtonGroup.add(showParking);
 
             // Add radio buttons to the panel
             this.add(showAll);
@@ -456,41 +472,58 @@ public class RouteNodesTable extends JPanel implements PropertyChangeListener {
             this.add(showParking);
 
             // Add action listeners to the radio buttons
-            showAll.addActionListener(new UpdateButtonListener(FILTER_ALL));
-            showMarkers.addActionListener(new UpdateButtonListener(FILTER_MARKERS));
-            showParking.addActionListener(new UpdateButtonListener(FILTER_PARKING));
+            showAll.addActionListener(new FilterButtonListener());
+            showMarkers.addActionListener(new FilterButtonListener());
+            showParking.addActionListener(new FilterButtonListener());
 
             showAll.setSelected(true);
         }
 
-        // TODO: Use reference to ButtonGroup and it's elements for this
+        /**
+         * Set or update the current filter
+         *
+         * @param filterType    Identifies the filter to be set, enumerated in FILTER_*
+         */
         public void setSelectedFilter(int filterType) {
-            for (Component component : getComponents()) {
-                if (component instanceof JRadioButton) {
-                    boolean selectButton = false;
-                    JRadioButton button = (JRadioButton) component;
-                    for (ActionListener al : button.getActionListeners()) {
-                        if (al instanceof UpdateButtonListener) {
-                            if (((UpdateButtonListener) al).filterType == filterType)
-                                selectButton = true;
-                        }
-                    }
-                    // Note that FILTER_CLEAR will have no buttons selected
-                    button.setSelected(selectButton);
-                }
+            Enumeration<AbstractButton> buttons = filterButtonGroup.getElements();
+            while (buttons.hasMoreElements()) {
+                FilterButton button = (FilterButton) buttons.nextElement();
+                // Note that FILTER_CLEAR will have no buttons selected
+                button.setSelected(button.filterType == filterType);
             }
+
             activeFilter = filterType;
             setTableFilter();
         }
 
-        // Filter button action listener
-        private class UpdateButtonListener implements ActionListener {
-            private final int filterType;
-
-            public UpdateButtonListener(int filterType) {
+        /**
+         * Filter Button adds filterType to link a button to its filter
+         */
+        private class FilterButton extends JRadioButton {
+            protected final int filterType;
+            public FilterButton(String text, int filterType) {
+                super(text);
                 this.filterType = filterType;
             }
-            public int getFilterType() { return filterType; }
+            public void addActionListener (FilterButtonListener l) {
+                l.setFilterType(filterType);
+                super.addActionListener(l);
+            }
+        }
+
+        /**
+         * Filter button action listener
+         */
+        // Todo: Can't we do without storing the filtertype here?
+        private class FilterButtonListener implements ActionListener {
+            private int filterType = -1;
+            public void setFilterType(int newFilterType) {
+                filterType = newFilterType;
+            }
+            public int getFilterType() {
+                return filterType;
+            }
+
             public void actionPerformed(ActionEvent e) {
                 activeFilter = this.filterType;
                 setTableFilter();
