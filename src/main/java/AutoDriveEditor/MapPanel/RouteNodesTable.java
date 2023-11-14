@@ -38,9 +38,12 @@ public class RouteNodesTable extends JPanel implements PropertyChangeListener {
         tableModel = new RouteNodesTableModel();
         table = new JTable(tableModel);
         columnWidthManager = new ColumnWidthManager();
+        table.setIntercellSpacing(new Dimension(5, 0));
 
         table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
         table.setAutoCreateRowSorter(true);
+        table.setShowGrid(true);
+        table.setGridColor(Color.gray);
 
         JScrollPane scrollPane = new JScrollPane(table);
         this.add(scrollPane, BorderLayout.CENTER);
