@@ -25,10 +25,10 @@ import static AutoDriveEditor.Utils.LoggerUtils.LOG;
  * changes to the networkNodesList
  */
 public class RouteNodesTable extends JPanel implements PropertyChangeListener {
-    private static boolean markerFilterActive = false;
     private final RouteNodesTableModel tableModel;
     private final JTable table;
     private final ColumnWidthManager columnWidthManager;
+    private final FilterButtonPanel filterButtonPanel;
     // Debug privately for now
     private final boolean bDebugRouteNodesTable = true; //TODO: Disable
 
@@ -49,9 +49,8 @@ public class RouteNodesTable extends JPanel implements PropertyChangeListener {
         buttonUpdate.addActionListener(new UpdateButtonListener());
         this.add(buttonUpdate, BorderLayout.SOUTH);
 
-        JButton buttonFilter = new JButton("Toggle Filter on Marker");
-        buttonFilter.addActionListener(new FilterButtonListener());
-        this.add(buttonFilter, BorderLayout.NORTH);
+        filterButtonPanel = new FilterButtonPanel();
+        this.add(filterButtonPanel, BorderLayout.NORTH);
     }
 
     public static RouteNodesTable getRouteNodesTable() {
@@ -71,11 +70,12 @@ public class RouteNodesTable extends JPanel implements PropertyChangeListener {
     public void unloadRoadMap() {
         // clear active sorter and filter
         if (table.getRowSorter() != null) {
-            toggleMarkerFilter();
+            filterButtonPanel.setSelectedFilter(FilterButtonPanel.FILTER_CLEAR);
         }
 
         tableModel.removeAllNodes();
         columnWidthManager.packColumns();
+        filterButtonPanel.setSelectedFilter(FilterButtonPanel.FILTER_ALL);
     }
 
     public void refreshRoadMap() {
@@ -147,27 +147,39 @@ public class RouteNodesTable extends JPanel implements PropertyChangeListener {
         return null;
     }
 
-    private void toggleMarkerFilter() {
-        if (markerFilterActive) {
-            table.setRowSorter(null);
-        } else {
-            TableRowSorter<RouteNodesTableModel> sorter = new TableRowSorter<>(tableModel);
-            sorter.setRowFilter(new RowFilter<RouteNodesTableModel, Integer>() {
-                @Override
-                public boolean include(RowFilter.Entry<? extends RouteNodesTableModel, ? extends Integer> entry) {
-                    boolean included = true;
-                    Object cellValue = entry.getModel().getValueAt(entry.getIdentifier(), 4);
-                    if (cellValue == null || cellValue.toString().trim().isEmpty()) {
-                        included = false;
-                    }
-                    return included;
-                }
-            });
-            table.setRowSorter(sorter);
+    private void setTableFilter() {
+        switch (filterButtonPanel.activeFilter) {
+            case FilterButtonPanel.FILTER_CLEAR:
+                table.setRowSorter(null);
+                break;
+            case FilterButtonPanel.FILTER_ALL:
+                table.setAutoCreateRowSorter(true);
+                break;
+            case FilterButtonPanel.FILTER_MARKERS:
+                table.setRowSorter(getFilterColumnNotEmpty(4));
+                break;
+            case FilterButtonPanel.FILTER_PARKING:
+                table.setRowSorter(getFilterColumnNotEmpty(5));
+                break;
+            default:
+                break;
         }
+    }
 
-        // toggle flag
-        markerFilterActive = !markerFilterActive;
+    private TableRowSorter<RouteNodesTableModel> getFilterColumnNotEmpty(int columnId) {
+        TableRowSorter<RouteNodesTableModel> sorter = new TableRowSorter<>(tableModel);
+        sorter.setRowFilter(new RowFilter<RouteNodesTableModel, Integer>() {
+            @Override
+            public boolean include(Entry<? extends RouteNodesTableModel, ? extends Integer> entry) {
+                boolean included = true;
+                Object cellValue = entry.getModel().getValueAt(entry.getIdentifier(), columnId);
+                if (cellValue == null || cellValue.toString().trim().isEmpty()) {
+                    included = false;
+                }
+                return included;
+            }
+        });
+        return sorter;
     }
 
     /**
@@ -416,6 +428,77 @@ public class RouteNodesTable extends JPanel implements PropertyChangeListener {
         }
     }
 
+    private class FilterButtonPanel extends JPanel {
+        // Filter states (enum not allowed for inner class at language level 11)
+        public static final int FILTER_CLEAR = -1;
+        public static final int FILTER_ALL = 0;
+        public static final int FILTER_MARKERS = 1;
+        public static final int FILTER_PARKING = 2;
+
+        protected int activeFilter = FILTER_CLEAR;
+
+
+        public FilterButtonPanel(){
+            ButtonGroup filterGroup = new ButtonGroup();
+
+            JRadioButton showAll = new JRadioButton("Show All");
+            JRadioButton showMarkers = new JRadioButton("Show Markers");
+            JRadioButton showParking = new JRadioButton("Show Parking");
+
+            // Add radio buttons to the button group
+            filterGroup.add(showAll);
+            filterGroup.add(showMarkers);
+            filterGroup.add(showParking);
+
+            // Add radio buttons to the panel
+            this.add(showAll);
+            this.add(showMarkers);
+            this.add(showParking);
+
+            // Add action listeners to the radio buttons
+            showAll.addActionListener(new UpdateButtonListener(FILTER_ALL));
+            showMarkers.addActionListener(new UpdateButtonListener(FILTER_MARKERS));
+            showParking.addActionListener(new UpdateButtonListener(FILTER_PARKING));
+
+            showAll.setSelected(true);
+        }
+
+        // TODO: Use reference to ButtonGroup and it's elements for this
+        public void setSelectedFilter(int filterType) {
+            for (Component component : getComponents()) {
+                if (component instanceof JRadioButton) {
+                    boolean selectButton = false;
+                    JRadioButton button = (JRadioButton) component;
+                    for (ActionListener al : button.getActionListeners()) {
+                        if (al instanceof UpdateButtonListener) {
+                            if (((UpdateButtonListener) al).filterType == filterType)
+                                selectButton = true;
+                        }
+                    }
+                    // Note that FILTER_CLEAR will have no buttons selected
+                    button.setSelected(selectButton);
+                }
+            }
+            activeFilter = filterType;
+            setTableFilter();
+        }
+
+        // Filter button action listener
+        private class UpdateButtonListener implements ActionListener {
+            private final int filterType;
+
+            public UpdateButtonListener(int filterType) {
+                this.filterType = filterType;
+            }
+            public int getFilterType() { return filterType; }
+            public void actionPerformed(ActionEvent e) {
+                activeFilter = this.filterType;
+                setTableFilter();
+            }
+
+        }
+    }
+
     /**
      * Action Listener
      */
@@ -425,9 +508,4 @@ public class RouteNodesTable extends JPanel implements PropertyChangeListener {
         }
     }
 
-    private class FilterButtonListener implements ActionListener {
-        public void actionPerformed(ActionEvent e) {
-            toggleMarkerFilter();
-        }
-    }
 }
