@@ -12,10 +12,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.util.Enumeration;
-import java.util.LinkedList;
+import java.util.*;
 import java.util.List;
-import java.util.Vector;
 import java.util.stream.Collectors;
 
 import static AutoDriveEditor.GUI.GUIBuilder.routeNodesTable;
@@ -71,6 +69,8 @@ public class RouteNodesTable extends JPanel implements PropertyChangeListener {
     }
 
     public void unloadRoadMap() {
+        int restoreSelectedFilter = filterButtonPanel.activeFilter;
+
         // clear active sorter and filter
         if (table.getRowSorter() != null) {
             filterButtonPanel.setSelectedFilter(FilterButtonPanel.FILTER_CLEAR);
@@ -78,7 +78,7 @@ public class RouteNodesTable extends JPanel implements PropertyChangeListener {
 
         tableModel.removeAllNodes();
         columnWidthManager.packColumns();
-        filterButtonPanel.setSelectedFilter(FilterButtonPanel.FILTER_ALL);
+        filterButtonPanel.setSelectedFilter(restoreSelectedFilter);
     }
 
     public void refreshRoadMap() {
@@ -167,6 +167,39 @@ public class RouteNodesTable extends JPanel implements PropertyChangeListener {
             default:
                 break;
         }
+        //
+        setColumnLayout();
+    }
+
+    private void setColumnLayout() {
+        TableColumnModel columnModel = table.getColumnModel();
+        int columnCount = columnModel.getColumnCount();
+
+        // create column layout
+        String[] columnOrder = new String[columnCount];
+        if ((filterButtonPanel.activeFilter == FilterButtonPanel.FILTER_MARKERS) ||
+                (filterButtonPanel.activeFilter == FilterButtonPanel.FILTER_PARKING)) {
+            columnOrder[0] = tableModel.getColumnName(0);   // Node ID
+            columnOrder[1] = tableModel.getColumnName(4);   // Marker Name
+            columnOrder[2] = tableModel.getColumnName(5);   // Marker Group
+            columnOrder[3] = tableModel.getColumnName(6);   // Parking Destination
+            columnOrder[4] = tableModel.getColumnName(1);   // X
+            columnOrder[5] = tableModel.getColumnName(2);   // Y
+            columnOrder[6] = tableModel.getColumnName(3);   // Z
+
+        } else {
+            // order as defined in table model
+            for (int i=0; i < columnCount; i++) {
+                columnOrder[i] = tableModel.getColumnName(i);
+            }
+        }
+
+        for (int i=0; i < columnCount; i++) {
+            int currIndex = columnModel.getColumnIndex(columnOrder[i]);
+            if (i != currIndex)
+                columnModel.moveColumn(currIndex, i);
+        }
+
     }
 
     private TableRowSorter<RouteNodesTableModel> getFilterColumnNotEmpty(int columnId) {
