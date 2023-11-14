@@ -14,6 +14,7 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.Enumeration;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Vector;
 import java.util.stream.Collectors;
 
@@ -288,14 +289,15 @@ public class RouteNodesTable extends JPanel implements PropertyChangeListener {
                 case 5:
                     return node.hasMapMarker() ? node.getMarkerGroup() : "";
                 case 6:
-                    LinkedList<Integer> list = safeCastToLinkedListInteger(node);
-                    if (list != null) {
-                        return list.stream()
-                                .map(Object::toString)
-                                .collect(Collectors.joining(", "));
-                    } else {
-                        return null;
+                    if (node.isParkDestination()) {
+                        List<Integer> list = (List<Integer>) node.getParkedVehiclesList();
+                        if (list != null) {
+                            return list.stream()
+                                    .map(Object::toString)
+                                    .collect(Collectors.joining(", "));
+                        }
                     }
+                    return null;
                 default:
                     return null;
             }
