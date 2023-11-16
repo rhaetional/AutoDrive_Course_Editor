@@ -5,6 +5,7 @@ import AutoDriveEditor.RoadNetwork.MapNode;
 import javax.swing.table.AbstractTableModel;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Vector;
 import java.util.stream.Collectors;
 
@@ -46,17 +47,8 @@ import java.util.stream.Collectors;
     }
 
     public MapNode getMapNodeById(int mapNodeID) {
-        MapNode mapNode = data.get(mapNodeID - 1);
-        if (mapNode.id != mapNodeID) {
-            for (MapNode n : data) {
-                if (n.id == mapNodeID) {
-                    mapNode = n;
-                    break;
-                }
-            }
-        }
-
-        return mapNode;
+        Optional<MapNode> result = data.stream().parallel().filter(node -> node.id == mapNodeID).findFirst();
+        return result.orElse(null);
     }
 
     public void updateNode(MapNode mapNode) {

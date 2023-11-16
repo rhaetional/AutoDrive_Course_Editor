@@ -17,6 +17,24 @@ import java.awt.event.MouseListener;
 import java.util.Enumeration;
 
 public class RouteNodesTableView extends JPanel implements TableModelListener {
+    public enum NodeFilterType {
+        FILTER_CLEAR(-1, "NULL"),
+        FILTER_ALL(0,"Show All"),
+        FILTER_MARKERS(1,"Show Markers"),
+        FILTER_PARKING(2,"Show Parking");
+        private String filterName;
+        private int filterId;
+        private NodeFilterType(int filterId, String filterName) {
+            this.filterId = filterId;
+            this.filterName = filterName;
+        }
+        public String getFilterName() {
+            return filterName;
+        }
+        public int getFilterId() {
+            return filterId;
+        }
+    }
     private final RouteNodesTableModel nodesTableModel;
     private final RouteNodesTable nodesTableController;
     private final JTable nodesTable;
@@ -36,18 +54,25 @@ public class RouteNodesTableView extends JPanel implements TableModelListener {
 
 
     /**
-     * clearTableFilter() and restoreTableFilter() are used to get around issues caused by the filters
+     * clearTableFilter() and setTableFilter() are used to get around issues caused by the filters
      * when all data is removed from the model.
      * TODO: There has to be a better way to avoid the above issue.
+     *
+     * @return NodeFilterType that was active before clearing
      */
-    public void clearTableFilter() {
+    public NodeFilterType clearTableFilter() {
+        NodeFilterType filterType = null;
+
         // clear active sorter and filter
         if (nodesTable.getRowSorter() != null) {
-            filterButtonPanel.setSelectedFilter(FilterButtonPanel.FILTER_CLEAR);
+            filterType = filterButtonPanel.activeFilter;
+            filterButtonPanel.setSelectedFilter(NodeFilterType.FILTER_CLEAR);
         }
+
+        return filterType;
     }
-    public void restoreTableFilter() {
-        filterButtonPanel.setSelectedFilter(filterButtonPanel.activeFilter);
+    public void setTableFilter(NodeFilterType selectedFilter) {
+        filterButtonPanel.setSelectedFilter(selectedFilter);
     }
 
     private void initializeUI() {
@@ -76,16 +101,16 @@ public class RouteNodesTableView extends JPanel implements TableModelListener {
 
     private void setTableFilter() {
         switch (filterButtonPanel.activeFilter) {
-            case FilterButtonPanel.FILTER_CLEAR:
+            case FILTER_CLEAR:
                 nodesTable.setRowSorter(null);
                 break;
-            case FilterButtonPanel.FILTER_ALL:
+            case FILTER_ALL:
                 nodesTable.setAutoCreateRowSorter(true);
                 break;
-            case FilterButtonPanel.FILTER_MARKERS:
+            case FILTER_MARKERS:
                 nodesTable.setRowSorter(getFilterColumnNotEmpty(4));
                 break;
-            case FilterButtonPanel.FILTER_PARKING:
+            case FILTER_PARKING:
                 nodesTable.setRowSorter(getFilterColumnNotEmpty(6));
                 break;
             default:
@@ -101,8 +126,8 @@ public class RouteNodesTableView extends JPanel implements TableModelListener {
 
         // create column layout
         String[] columnOrder = new String[columnCount];
-        if ((filterButtonPanel.activeFilter == FilterButtonPanel.FILTER_MARKERS) ||
-                (filterButtonPanel.activeFilter == FilterButtonPanel.FILTER_PARKING)) {
+        if ((filterButtonPanel.activeFilter == NodeFilterType.FILTER_MARKERS) ||
+                (filterButtonPanel.activeFilter == NodeFilterType.FILTER_PARKING)) {
             columnOrder[0] = nodesTableModel.getColumnName(0);   // Node ID
             columnOrder[1] = nodesTableModel.getColumnName(4);   // Marker Name
             columnOrder[2] = nodesTableModel.getColumnName(5);   // Marker Group
@@ -253,22 +278,17 @@ public class RouteNodesTableView extends JPanel implements TableModelListener {
      * Class to encapsulate the FilterPanel and its "Filter States"
      */
     private class FilterButtonPanel extends JPanel {
-        // Filter states (enum not allowed for inner class at language level 11)
-        public static final int FILTER_CLEAR = -1;
-        public static final int FILTER_ALL = 0;
-        public static final int FILTER_MARKERS = 1;
-        public static final int FILTER_PARKING = 2;
 
-        protected int activeFilter = FILTER_CLEAR;
+        protected NodeFilterType activeFilter = NodeFilterType.FILTER_CLEAR;
         private ButtonGroup filterButtonGroup;
 
 
         public FilterButtonPanel() {
             filterButtonGroup = new ButtonGroup();
 
-            FilterButton showAll = new FilterButton("Show All", FILTER_ALL);
-            FilterButton showMarkers = new FilterButton("Show Markers", FILTER_MARKERS);
-            FilterButton showParking = new FilterButton("Show Parking", FILTER_PARKING);
+            FilterButton showAll = new FilterButton(NodeFilterType.FILTER_ALL);
+            FilterButton showMarkers = new FilterButton(NodeFilterType.FILTER_MARKERS);
+            FilterButton showParking = new FilterButton(NodeFilterType.FILTER_PARKING);
 
             // Add radio buttons to the button group
             filterButtonGroup.add(showAll);
@@ -291,9 +311,9 @@ public class RouteNodesTableView extends JPanel implements TableModelListener {
         /**
          * Set or update the current filter
          *
-         * @param filterType Identifies the filter to be set, enumerated in FILTER_*
+         * @param filterType Identifies the filter to be set, enumerated in NodeFilterType
          */
-        public void setSelectedFilter(int filterType) {
+        public void setSelectedFilter(NodeFilterType filterType) {
             Enumeration<AbstractButton> buttons = filterButtonGroup.getElements();
             while (buttons.hasMoreElements()) {
                 FilterButton button = (FilterButton) buttons.nextElement();
@@ -309,10 +329,10 @@ public class RouteNodesTableView extends JPanel implements TableModelListener {
          * Filter Button adds filterType to link a button to its filter
          */
         private class FilterButton extends JRadioButton {
-            protected final int filterType;
+            protected final NodeFilterType filterType;
 
-            public FilterButton(String text, int filterType) {
-                super(text);
+            public FilterButton(NodeFilterType filterType) {
+                super(filterType.getFilterName());
                 this.filterType = filterType;
             }
 
@@ -327,13 +347,13 @@ public class RouteNodesTableView extends JPanel implements TableModelListener {
          */
         // Todo: Can't we do without storing the filtertype here?
         private class FilterButtonListener implements ActionListener {
-            private int filterType = -1;
+            private NodeFilterType filterType = NodeFilterType.FILTER_CLEAR;
 
-            public void setFilterType(int newFilterType) {
+            public void setFilterType(NodeFilterType newFilterType) {
                 filterType = newFilterType;
             }
 
-            public int getFilterType() {
+            public NodeFilterType getFilterType() {
                 return filterType;
             }
 
