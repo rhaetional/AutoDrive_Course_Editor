@@ -15,7 +15,7 @@ import AutoDriveEditor.GUI.Buttons.Options.*;
 import AutoDriveEditor.GUI.Buttons.Testing.TestButton;
 import AutoDriveEditor.Listeners.CurvePanelListener;
 import AutoDriveEditor.MapPanel.MapPanel;
-import AutoDriveEditor.MapPanel.RouteNodesTable;
+import AutoDriveEditor.MapPanel.routeNodesTable.RouteNodesTable;
 
 import javax.swing.*;
 import javax.swing.border.BevelBorder;
@@ -278,7 +278,7 @@ public class GUIBuilder {
 
    public static JPanel createRouteNodesTable() {
         routeNodesTable = new RouteNodesTable();
-        return routeNodesTable;
+        return routeNodesTable.getView();
    }
 
     private static void switchToolbarLayoutToHorizontal() {

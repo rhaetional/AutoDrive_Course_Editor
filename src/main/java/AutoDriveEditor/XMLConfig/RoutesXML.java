@@ -34,7 +34,7 @@ import static AutoDriveEditor.Managers.MultiSelectManager.clearMultiSelection;
 import static AutoDriveEditor.Managers.ScanManager.scanNetworkForOverlapNodes;
 import static AutoDriveEditor.MapPanel.MapImage.*;
 import static AutoDriveEditor.MapPanel.MapPanel.*;
-import static AutoDriveEditor.MapPanel.RouteNodesTable.*;
+import static AutoDriveEditor.MapPanel.routeNodesTable.RouteNodesTable.getRouteNodesTable;
 import static AutoDriveEditor.RoadNetwork.RoadMap.setRoadMapNodes;
 import static AutoDriveEditor.Utils.FileUtils.removeExtension;
 import static AutoDriveEditor.Utils.LoggerUtils.LOG;
