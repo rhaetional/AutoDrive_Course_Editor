@@ -28,6 +28,10 @@ public class RouteNodesTable implements PropertyChangeListener {
         this.nodesTableModel = new RouteNodesTableModel();
         this.nodesTableView = new RouteNodesTableView(this, nodesTableModel);
     }
+    public RouteNodesTable(RouteNodesTableModel nodesTableModel, RouteNodesTableView nodesTableView) {
+        this.nodesTableModel = nodesTableModel;
+        this.nodesTableView = nodesTableView;
+    }
 
     public static RouteNodesTable getRouteNodesTable() {
         return routeNodesTable;

@@ -198,6 +198,14 @@ public class RouteNodesTableView extends JPanel implements TableModelListener {
 
     }
 
+    public JTable getTable() {
+        return nodesTable;
+    }
+
+    public FilterButtonPanel getFilterButtonPanel() {
+        return filterButtonPanel;
+    }
+
     /**
      * Maintains Column widths based on content.
      * Needs to be re-initialised, if columns are dynamically added to the model
