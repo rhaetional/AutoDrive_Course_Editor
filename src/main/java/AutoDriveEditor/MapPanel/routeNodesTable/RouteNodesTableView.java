@@ -19,26 +19,30 @@ import java.util.Enumeration;
 public class RouteNodesTableView extends JPanel implements TableModelListener {
     public enum NodeFilterType {
         FILTER_CLEAR(-1, "NULL"),
-        FILTER_ALL(0,"Show All"),
-        FILTER_MARKERS(1,"Show Markers"),
-        FILTER_PARKING(2,"Show Parking");
+        FILTER_ALL(0, "Show All"),
+        FILTER_MARKERS(1, "Show Markers"),
+        FILTER_PARKING(2, "Show Parking");
         private String filterName;
         private int filterId;
+
         private NodeFilterType(int filterId, String filterName) {
             this.filterId = filterId;
             this.filterName = filterName;
         }
+
         public String getFilterName() {
             return filterName;
         }
+
         public int getFilterId() {
             return filterId;
         }
     }
+
     private final RouteNodesTableModel nodesTableModel;
     private final RouteNodesTable nodesTableController;
     private final JTable nodesTable;
-    private final ColumnWidthManager columnWidthManager;
+    private final TableColumnAdjuster tableColumnAdjuster;
     private final FilterButtonPanel filterButtonPanel;
 
     public RouteNodesTableView(RouteNodesTable routeNodesTable, RouteNodesTableModel nodesTableModel) {
@@ -47,7 +51,7 @@ public class RouteNodesTableView extends JPanel implements TableModelListener {
         this.nodesTableModel.addTableModelListener(this);
 
         nodesTable = new JTable(nodesTableModel);
-        columnWidthManager = new ColumnWidthManager();
+        tableColumnAdjuster = new TableColumnAdjuster(nodesTable);
         filterButtonPanel = new FilterButtonPanel();
         initializeUI();
     }
@@ -71,6 +75,7 @@ public class RouteNodesTableView extends JPanel implements TableModelListener {
 
         return filterType;
     }
+
     public void setTableFilter(NodeFilterType selectedFilter) {
         filterButtonPanel.setSelectedFilter(selectedFilter);
     }
@@ -79,13 +84,18 @@ public class RouteNodesTableView extends JPanel implements TableModelListener {
 
         this.setLayout(new BorderLayout());
 
-        // configure table
+        // TABLE
         nodesTable.setIntercellSpacing(new Dimension(5, 0));
         nodesTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         nodesTable.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
         nodesTable.setAutoCreateRowSorter(true);
         nodesTable.setShowGrid(true);
-        nodesTable.setGridColor(Color.gray);
+        nodesTable.setGridColor(Color.lightGray);
+        nodesTable.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
+
+        // COLUMNS
+//        tableColumnAdjuster.setDynamicAdjustment(true);
+        tableColumnAdjuster.adjustColumns();
 
         JScrollPane scrollPane = new JScrollPane(nodesTable);
         this.add(scrollPane, BorderLayout.CENTER);
@@ -94,6 +104,8 @@ public class RouteNodesTableView extends JPanel implements TableModelListener {
         buttonUpdate.addActionListener(new UpdateButtonListener());
         this.add(buttonUpdate, BorderLayout.SOUTH);
 
+
+        // FILTER
         this.add(filterButtonPanel, BorderLayout.NORTH);
 
         nodesTable.addMouseListener(new TableMouseAdapter());
@@ -178,19 +190,19 @@ public class RouteNodesTableView extends JPanel implements TableModelListener {
     public void tableChanged(TableModelEvent e) {
         switch (e.getType()) {
             case TableModelEvent.INSERT:
-                columnWidthManager.updateMaxColumnWidth(nodesTableModel.getRowCount() - 1);
-                break;
+//                columnWidthManager.updateMaxColumnWidth(nodesTableModel.getRowCount() - 1);
+//                break;
             case TableModelEvent.DELETE:
-                break;
+//                break;
             case TableModelEvent.UPDATE:
-                if (e.getFirstRow() != e.getLastRow()) {
-                    // refresh entire table. Crude, but sufficient for now.
-                    columnWidthManager.packColumns();
-                } else {
-                    //update single row
-                    columnWidthManager.updateMaxColumnWidth(e.getFirstRow());
-                }
-                break;
+//                if (e.getFirstRow() != e.getLastRow()) {
+//                    // refresh entire table. Crude, but sufficient for now.
+//                    tableColumnAdjuster.
+//                } else {
+//                    //update single row
+////                    columnWidthManager.updateMaxColumnWidth(e.getFirstRow());
+//                }
+//                break;
             default:
                 break;
         }
@@ -209,7 +221,10 @@ public class RouteNodesTableView extends JPanel implements TableModelListener {
     /**
      * Maintains Column widths based on content.
      * Needs to be re-initialised, if columns are dynamically added to the model
+     *
+     * DEPRECATED: Moving to TableColumnAdjuster
      */
+    @Deprecated
     private class ColumnWidthManager {
         Integer[] columnWidths;
         int padding = 5;
@@ -250,27 +265,26 @@ public class RouteNodesTableView extends JPanel implements TableModelListener {
         }
 
         public void updateMaxColumnWidth(int row) {
+                for (int column = 0; column < columnWidths.length; column++) {
+                    TableColumn tableColumn = nodesTable.getColumnModel().getColumn(column);
+                    int newColumnWidth = 15; // Set a minimum width
 
-            for (int column = 0; column < columnWidths.length; column++) {
-                TableColumn tableColumn = nodesTable.getColumnModel().getColumn(column);
-                int newColumnWidth = 15; // Set a minimum width
+                    TableCellRenderer renderer = nodesTable.getCellRenderer(row, column);
+                    Component comp = nodesTable.prepareRenderer(renderer, row, column);
+                    newColumnWidth = Math.max(comp.getPreferredSize().width + padding, newColumnWidth);
 
-                TableCellRenderer renderer = nodesTable.getCellRenderer(row, column);
-                Component comp = nodesTable.prepareRenderer(renderer, row, column);
-                newColumnWidth = Math.max(comp.getPreferredSize().width + padding, newColumnWidth);
+                    // Min Width = header width
+                    newColumnWidth = Math.max(newColumnWidth, getColumnHeaderWidth(tableColumn));
 
-                // Min Width = header width
-                newColumnWidth = Math.max(newColumnWidth, getColumnHeaderWidth(tableColumn));
+                    // Max Width
+                    if (newColumnWidth > 300)
+                        newColumnWidth = 300;
 
-                // Max Width
-                if (newColumnWidth > 300)
-                    newColumnWidth = 300;
-
-                if (newColumnWidth > columnWidths[column]) {
-                    columnWidths[column] = newColumnWidth;
-                    nodesTable.getColumnModel().getColumn(column).setPreferredWidth(newColumnWidth);
+                    if (newColumnWidth > columnWidths[column]) {
+                        columnWidths[column] = newColumnWidth;
+                        nodesTable.getColumnModel().getColumn(column).setPreferredWidth(newColumnWidth);
+                    }
                 }
-            }
         }
 
         private int getColumnHeaderWidth(TableColumn col) {
@@ -329,6 +343,10 @@ public class RouteNodesTableView extends JPanel implements TableModelListener {
                 button.setSelected(button.filterType == filterType);
             }
 
+            if (filterType == NodeFilterType.FILTER_CLEAR) {
+                nodesTable.setRowSorter(null);
+            }
+
             activeFilter = filterType;
             setTableFilter();
         }
@@ -379,7 +397,7 @@ public class RouteNodesTableView extends JPanel implements TableModelListener {
      */
     private class UpdateButtonListener implements ActionListener {
         public void actionPerformed(ActionEvent e) {
-            nodesTableController.refreshRoadMap();
+            tableColumnAdjuster.adjustColumns();
         }
     }
 
