@@ -43,14 +43,18 @@ public class RouteNodesTable implements PropertyChangeListener {
             for (MapNode node : roadList) {
                 nodesTableModel.addNode(node);
             }
+            nodesTableView.resizeTableColumns();
         }
     }
 
     public void unloadRoadMap() {
         RouteNodesTableView.NodeFilterType selectedFilter;
         selectedFilter = nodesTableView.clearTableFilter();
+
         nodesTableModel.removeAllNodes();
+
         nodesTableView.setTableFilter(selectedFilter);
+        nodesTableView.resizeTableColumns();
     }
 
     public void refreshRoadMap() {
