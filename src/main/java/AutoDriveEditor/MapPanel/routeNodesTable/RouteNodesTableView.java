@@ -5,8 +5,6 @@ import AutoDriveEditor.RoadNetwork.MapNode;
 import javax.swing.*;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
-import javax.swing.table.TableCellRenderer;
-import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 import javax.swing.table.TableRowSorter;
 import java.awt.*;
@@ -22,18 +20,15 @@ public class RouteNodesTableView extends JPanel implements TableModelListener {
         FILTER_ALL(0, "Show All"),
         FILTER_MARKERS(1, "Show Markers"),
         FILTER_PARKING(2, "Show Parking");
-        private String filterName;
-        private int filterId;
-
-        private NodeFilterType(int filterId, String filterName) {
+        final String filterName;
+        final int filterId;
+        NodeFilterType(int filterId, String filterName) {
             this.filterId = filterId;
             this.filterName = filterName;
         }
-
         public String getFilterName() {
             return filterName;
         }
-
         public int getFilterId() {
             return filterId;
         }
@@ -192,25 +187,15 @@ public class RouteNodesTableView extends JPanel implements TableModelListener {
     @Override
     public void tableChanged(TableModelEvent e) {
         switch (e.getType()) {
-            case TableModelEvent.INSERT:
-//                columnWidthManager.updateMaxColumnWidth(nodesTableModel.getRowCount() - 1);
-//                break;
-            case TableModelEvent.DELETE:
-                break;
             case TableModelEvent.UPDATE:
                 // Disabled, as high-performance impact for little value
 //                if (e.getFirstRow() == 0 && e.getLastRow() == Integer.MAX_VALUE) {
 //                    // Entire table updated
 //                    tableColumnAdjuster.adjustColumns();
 //                }
-//                if (e.getFirstRow() != e.getLastRow()) {
-//                    // refresh entire table. Crude, but sufficient for now.
-//                    tableColumnAdjuster.
-//                } else {
-//                    //update single row
-////                    columnWidthManager.updateMaxColumnWidth(e.getFirstRow());
-//                }
                 break;
+            case TableModelEvent.INSERT:
+            case TableModelEvent.DELETE:
             default:
                 break;
         }
@@ -222,95 +207,13 @@ public class RouteNodesTableView extends JPanel implements TableModelListener {
         return nodesTable;
     }
 
-    public FilterButtonPanel getFilterButtonPanel() {
-        return filterButtonPanel;
-    }
-
-    /**
-     * Maintains Column widths based on content.
-     * Needs to be re-initialised, if columns are dynamically added to the model
-     *
-     * DEPRECATED: Moving to TableColumnAdjuster
-     */
-    @Deprecated
-    private class ColumnWidthManager {
-        Integer[] columnWidths;
-        int padding = 5;
-
-        public ColumnWidthManager() {
-            columnWidths = new Integer[nodesTableModel.getColumnCount()];
-            packColumns();
-        }
-
-        public void packColumns() {
-//            int tableWidth = 0;
-
-            for (int column = 0; column < columnWidths.length; column++) {
-                TableColumn tableColumn = nodesTable.getColumnModel().getColumn(column);
-                int preferredWidth = 15; // Set a minimum width
-
-                for (int row = 0; row < nodesTable.getRowCount(); row++) {
-                    TableCellRenderer renderer = nodesTable.getCellRenderer(row, column);
-                    Component comp = nodesTable.prepareRenderer(renderer, row, column);
-                    preferredWidth = Math.max(comp.getPreferredSize().width + padding, preferredWidth);
-                }
-
-                // Min Width = header width
-                preferredWidth = Math.max(preferredWidth, getColumnHeaderWidth(tableColumn));
-
-                // Max Width
-                if (preferredWidth > 300)
-                    preferredWidth = 300;
-
-                columnWidths[column] = preferredWidth;
-                nodesTable.getColumnModel().getColumn(column).setPreferredWidth(preferredWidth);
-
-//                tableWidth += preferredWidth;
-//                 LOG.info("ColumnWidthManager.packColumns(): Column id {}\tWIDTH: calculated {}\tmin {}\tpref {}\tmax {}\tactual {}", tableColumn.getIdentifier(), preferredWidth, tableColumn.getMinWidth(),tableColumn.getPreferredWidth(),tableColumn.getMaxWidth(),tableColumn.getWidth());
-
-            }
-//             LOG.info("ColumnWidthManager.packColumns(): Table WIDTH: calculated {}\tmin {}\tpref {}\tmax {}\tactual {}", tableWidth, nodesTable.getMinimumSize().width, nodesTable.getPreferredSize().width, nodesTable.getMaximumSize().width, nodesTable.getSize().width);
-        }
-
-        public void updateMaxColumnWidth(int row) {
-                for (int column = 0; column < columnWidths.length; column++) {
-                    TableColumn tableColumn = nodesTable.getColumnModel().getColumn(column);
-                    int newColumnWidth = 15; // Set a minimum width
-
-                    TableCellRenderer renderer = nodesTable.getCellRenderer(row, column);
-                    Component comp = nodesTable.prepareRenderer(renderer, row, column);
-                    newColumnWidth = Math.max(comp.getPreferredSize().width + padding, newColumnWidth);
-
-                    // Min Width = header width
-                    newColumnWidth = Math.max(newColumnWidth, getColumnHeaderWidth(tableColumn));
-
-                    // Max Width
-                    if (newColumnWidth > 300)
-                        newColumnWidth = 300;
-
-                    if (newColumnWidth > columnWidths[column]) {
-                        columnWidths[column] = newColumnWidth;
-                        nodesTable.getColumnModel().getColumn(column).setPreferredWidth(newColumnWidth);
-                    }
-                }
-        }
-
-        private int getColumnHeaderWidth(TableColumn col) {
-            TableCellRenderer renderer = nodesTable.getTableHeader().getDefaultRenderer();
-
-            Component comp = renderer.getTableCellRendererComponent(nodesTable,
-                    col.getHeaderValue(), false, false, 0, 0);
-            return comp.getPreferredSize().width;
-        }
-    }
-
     /**
      * Class to encapsulate the FilterPanel and its "Filter States"
      */
     private class FilterButtonPanel extends JPanel {
 
         protected NodeFilterType activeFilter = NodeFilterType.FILTER_CLEAR;
-        private ButtonGroup filterButtonGroup;
+        private final ButtonGroup filterButtonGroup;
 
 
         public FilterButtonPanel() {

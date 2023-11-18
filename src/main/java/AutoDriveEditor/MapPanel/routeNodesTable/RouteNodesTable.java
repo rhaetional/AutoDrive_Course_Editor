@@ -13,10 +13,9 @@ import static AutoDriveEditor.GUI.GUIBuilder.routeNodesTable;
 import static AutoDriveEditor.Utils.LoggerUtils.LOG;
 
 /**
- * JPanel to display a JTable of the MapNodes currently stored in MapPanel.RoadMap.networkNodesList.
+ * Controller for JPanel (View) displaying a JTable of the MapNodes currently stored in MapPanel.RoadMap.networkNodesList.
+ * Data is managed via RouteNodesTableModel.
  * It implements PropertyChangeListener for RoadMap as subject to be informed when MapNodes are added or removed.
- * Updates to existing nodes are "caught" by overloading RoadMap.refresh(), as RoadMap has no awareness about these
- * changes to the networkNodesList
  */
 public class RouteNodesTable implements PropertyChangeListener {
     private final RouteNodesTableModel nodesTableModel;
@@ -37,6 +36,10 @@ public class RouteNodesTable implements PropertyChangeListener {
         return routeNodesTable;
     }
 
+    /**
+     * Loads LinkedList of MapNodes to the model
+     * @param roadList MapNodes to be added to model
+     */
     public void loadRoadMap(LinkedList<MapNode> roadList) {
         if (roadList != null) {
             // Data to be displayed in the JTable
@@ -47,6 +50,9 @@ public class RouteNodesTable implements PropertyChangeListener {
         }
     }
 
+    /**
+     * Removes all MapNodes from model / view
+     */
     public void unloadRoadMap() {
         RouteNodesTableView.NodeFilterType selectedFilter;
         selectedFilter = nodesTableView.clearTableFilter();
@@ -57,6 +63,9 @@ public class RouteNodesTable implements PropertyChangeListener {
         nodesTableView.resizeTableColumns();
     }
 
+    /**
+     * Refreshed data in model and, thus, view
+     */
     public void refreshRoadMap() {
         nodesTableModel.updateAllNodes();
     }
