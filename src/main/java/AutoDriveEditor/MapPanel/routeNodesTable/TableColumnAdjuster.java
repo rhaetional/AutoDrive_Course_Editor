@@ -15,7 +15,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /*
- *	Class to manage the widths of colunmns in a table.
+ *	Class to manage the widths of columns in a table.
  *
  *  Various properties control how the width of the column is calculated.
  *  Another property controls whether column width calculation should be dynamic.
@@ -27,6 +27,8 @@ import java.util.Map;
  *  of the columns must fit inside the table. So if you increase one column, one
  *  or more of the other columns must decrease. Because of this the resize mode
  *  of RESIZE_ALL_COLUMNS will work the best.
+ *
+ * Source: https://github.com/tips4java/tips4java/blob/main/source/TableColumnAdjuster.java
  */
 public class TableColumnAdjuster implements PropertyChangeListener, TableModelListener
 {
@@ -36,7 +38,7 @@ public class TableColumnAdjuster implements PropertyChangeListener, TableModelLi
 	private boolean isColumnDataIncluded;
 	private boolean isOnlyAdjustLarger;
 	private boolean isDynamicAdjustment;
-	private Map<TableColumn, Integer> columnSizes = new HashMap<TableColumn, Integer>();
+	private Map<TableColumn, Integer> columnSizes = new HashMap<>();
 
 	/*
 	 *  Specify the table and use default spacing
@@ -138,13 +140,12 @@ public class TableColumnAdjuster implements PropertyChangeListener, TableModelLi
 	 */
 	private int getCellDataWidth(int row, int column)
 	{
-		//  Inovke the renderer for the cell to calculate the preferred width
+		//  Invoke the renderer for the cell to calculate the preferred width
 
 		TableCellRenderer cellRenderer = table.getCellRenderer(row, column);
 		Component c = table.prepareRenderer(cellRenderer, row, column);
-		int width = c.getPreferredSize().width + table.getIntercellSpacing().width;
 
-		return width;
+        return c.getPreferredSize().width + table.getIntercellSpacing().width;
 	}
 
 	/*
@@ -165,7 +166,7 @@ public class TableColumnAdjuster implements PropertyChangeListener, TableModelLi
 			width = Math.max(width, tableColumn.getPreferredWidth());
 		}
 
-		columnSizes.put(tableColumn, new Integer(tableColumn.getWidth()));
+		columnSizes.put(tableColumn, tableColumn.getWidth());
 
 		table.getTableHeader().setResizingColumn(tableColumn);
 		tableColumn.setWidth(width);
@@ -195,7 +196,7 @@ public class TableColumnAdjuster implements PropertyChangeListener, TableModelLi
 		if (width != null)
 		{
 			table.getTableHeader().setResizingColumn(tableColumn);
-			tableColumn.setWidth( width.intValue() );
+			tableColumn.setWidth(width);
 		}
 	}
 
@@ -274,46 +275,42 @@ public class TableColumnAdjuster implements PropertyChangeListener, TableModelLi
 
 		//  Needed when table is sorted.
 
-		SwingUtilities.invokeLater(new Runnable()
-		{
-			public void run()
-			{
-				//  A cell has been updated
+		SwingUtilities.invokeLater(() -> {
+            //  A cell has been updated
 
-				int column = table.convertColumnIndexToView(e.getColumn());
+            int column = table.convertColumnIndexToView(e.getColumn());
 
-				if (e.getType() == TableModelEvent.UPDATE && column != -1)
-				{
-					//  Only need to worry about an increase in width for this cell
+            if (e.getType() == TableModelEvent.UPDATE && column != -1)
+            {
+                //  Only need to worry about an increase in width for this cell
 
-					if (isOnlyAdjustLarger)
-					{
-						int	row = e.getFirstRow();
-						TableColumn tableColumn = table.getColumnModel().getColumn(column);
+                if (isOnlyAdjustLarger)
+                {
+                    int	row = e.getFirstRow();
+                    TableColumn tableColumn = table.getColumnModel().getColumn(column);
 
-						if (tableColumn.getResizable())
-						{
-							int width =	getCellDataWidth(row, column);
-							updateTableColumn(column, width);
-						}
-					}
+                    if (tableColumn.getResizable())
+                    {
+                        int width =	getCellDataWidth(row, column);
+                        updateTableColumn(column, width);
+                    }
+                }
 
-					//	Could be an increase of decrease so check all rows
+                //	Could be an increase of decrease so check all rows
 
-					else
-					{
-						adjustColumn( column );
-					}
-				}
+                else
+                {
+                    adjustColumn( column );
+                }
+            }
 
-				//  The update affected more than one column so adjust all columns
+            //  The update affected more than one column so adjust all columns
 
-				else
-				{
-					adjustColumns();
-				}
-			}
-		});
+            else
+            {
+                adjustColumns();
+            }
+        });
 	}
 
 	/*
@@ -377,13 +374,12 @@ public class TableColumnAdjuster implements PropertyChangeListener, TableModelLi
 			{
 				int[] columns = table.getSelectedColumns();
 
-				for (int i = 0; i < columns.length; i++)
-				{
-					if (isAdjust)
-						adjustColumn(columns[i]);
-					else
-						restoreColumn(columns[i]);
-				}
+                for (int column : columns) {
+                    if (isAdjust)
+                        adjustColumn(column);
+                    else
+                        restoreColumn(column);
+                }
 			}
 			else
 			{
