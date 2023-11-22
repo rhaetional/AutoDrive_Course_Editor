@@ -59,8 +59,8 @@ import java.util.stream.Collectors;
     }
      /**
       * Update MapNode in model
-      *         NOTE: Currently redundant, as the model contains the MapNodes by reference,
-      *               so all changes in the MapPanel are effective immediately
+      *         NOTE: The nodes in the model (data) refer to the same objects as the roadMap. Thus, any changes
+      *             are immediately available. This function only informs any listeners (eg. view) of this change.
       * @param mapNode The MapNode to update
       */
     public void updateNode(MapNode mapNode) {

@@ -4,7 +4,6 @@ import AutoDriveEditor.GUI.Buttons.BaseButton;
 import AutoDriveEditor.Managers.ChangeManager;
 import AutoDriveEditor.MapPanel.MapPanel;
 import AutoDriveEditor.RoadNetwork.MapNode;
-import AutoDriveEditor.RoadNetwork.RoadMap;
 
 import javax.swing.*;
 import java.awt.event.MouseEvent;
@@ -18,7 +17,7 @@ import static AutoDriveEditor.GUI.Buttons.Curves.QuadCurveButton.isQuadCurveCrea
 import static AutoDriveEditor.GUI.Buttons.Curves.QuadCurveButton.quadCurve;
 import static AutoDriveEditor.GUI.MenuBuilder.bDebugLogUndoRedo;
 import static AutoDriveEditor.Locale.LocaleManager.getLocaleString;
-import static AutoDriveEditor.Managers.MultiSelectManager.*;
+import static AutoDriveEditor.Managers.MultiSelectManager.multiSelectList;
 import static AutoDriveEditor.Managers.ScanManager.checkAllNodesForOverlap;
 import static AutoDriveEditor.Managers.ScanManager.checkAreaForNodeOverlap;
 import static AutoDriveEditor.MapPanel.MapPanel.*;
@@ -175,7 +174,7 @@ public class MoveNodeButton extends BaseButton {
             }
         }
         canAutoSave = true;
-        getMapPanel().getRoadMap().refreshListeners();
+        getMapPanel().getRoadMap().refreshAllTableNodes();
         getMapPanel().repaint();
     }
 
@@ -205,7 +204,7 @@ public class MoveNodeButton extends BaseButton {
             for (MapNode node : this.moveNodes) {
                 checkAreaForNodeOverlap(node);
             }
-            getMapPanel().getRoadMap().refreshListeners();
+            getMapPanel().getRoadMap().refreshAllTableNodes();
             getMapPanel().repaint();
             setStale(this.isStale);
         }
@@ -215,7 +214,7 @@ public class MoveNodeButton extends BaseButton {
             for (MapNode node : this.moveNodes) {
                 checkAreaForNodeOverlap(node);
             }
-            getMapPanel().getRoadMap().refreshListeners();
+            getMapPanel().getRoadMap().refreshAllTableNodes();
             getMapPanel().repaint();
             setStale(true);
         }

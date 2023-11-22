@@ -148,7 +148,11 @@ public class RoadMap {
         pcs.addPropertyChangeListener(listener);
     }
 
-    public void refreshListeners() {
+    //TODO: Replace getMapPanel().getRoadMap().refreshAllTableNodes(); with calls to refreshTableNode() wherever possible.
+    public void refreshAllTableNodes() {
         pcs.firePropertyChange("networkNodesList.refreshList", null, networkNodesList);
+    }
+    public void refreshTableNode(MapNode node) {
+        pcs.firePropertyChange("networkNodesList.refresh", null, node);
     }
 }

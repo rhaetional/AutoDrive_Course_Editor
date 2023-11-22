@@ -89,6 +89,9 @@ public class RouteNodesTable implements PropertyChangeListener {
             case "networkNodesList.add":
                 nodesTableModel.addNode((MapNode) evt.getNewValue());
                 break;
+            case "networkNodesList.refresh":
+                nodesTableModel.updateNode((MapNode) evt.getNewValue());
+                break;
             case "networkNodesList.removeAll":
                 for (MapNode node : safeCastToLinkedListMapNode(evt.getOldValue())) {
                     nodesTableModel.removeNode(node);

@@ -13,7 +13,7 @@ public abstract class CopyPasteBaseButton extends BaseButton {
     public static void cutSelected() {
         if (isMultipleSelected && multiSelectList.size() > 0 ) {
             cnpManager.CutSelection(multiSelectList);
-            getMapPanel().getRoadMap().refreshListeners();
+            getMapPanel().getRoadMap().refreshAllTableNodes();
             MapPanel.getMapPanel().repaint();
 
         } else {

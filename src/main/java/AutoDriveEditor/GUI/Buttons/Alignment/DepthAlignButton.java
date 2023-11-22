@@ -37,6 +37,6 @@ public class DepthAlignButton extends AlignBaseButton {
         for (MapNode node : multiSelectList) {
             node.y = toNode.y;
         }
-        getMapPanel().getRoadMap().refreshListeners();
+        getMapPanel().getRoadMap().refreshAllTableNodes();
     }
 }

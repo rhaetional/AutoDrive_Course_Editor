@@ -47,7 +47,7 @@ public class DeleteMarkerButton extends MarkerBaseButton {
         changeManager.addChangeable( new MarkerRemoveChanger(fromMapNode));
         fromMapNode.removeMapMarker();
         setStale(true);
-        getMapPanel().getRoadMap().refreshListeners();
+        getMapPanel().getRoadMap().refreshAllTableNodes();
         getMapPanel().repaint();
         canAutoSave = true;
     }
@@ -67,14 +67,14 @@ public class DeleteMarkerButton extends MarkerBaseButton {
 
         public void undo(){
             this.markerNode.createMapMarker(this.markerName, this.markerGroup);
-            getMapPanel().getRoadMap().refreshListeners();
+            getMapPanel().getRoadMap().refreshAllTableNodes();
             getMapPanel().repaint();
             setStale(this.isStale);
         }
 
         public void redo(){
             this.markerNode.removeMapMarker();
-            getMapPanel().getRoadMap().refreshListeners();
+            getMapPanel().getRoadMap().refreshAllTableNodes();
             getMapPanel().repaint();
             setStale(true);
         }

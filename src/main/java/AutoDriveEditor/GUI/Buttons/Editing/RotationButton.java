@@ -18,7 +18,7 @@ import java.util.concurrent.locks.Lock;
 import static AutoDriveEditor.AutoDriveEditor.changeManager;
 import static AutoDriveEditor.GUI.MenuBuilder.bDebugLogUndoRedo;
 import static AutoDriveEditor.Locale.LocaleManager.getLocaleString;
-import static AutoDriveEditor.Managers.MultiSelectManager.*;
+import static AutoDriveEditor.Managers.MultiSelectManager.multiSelectList;
 import static AutoDriveEditor.MapPanel.MapPanel.*;
 import static AutoDriveEditor.Utils.GUIUtils.makeImageToggleButton;
 import static AutoDriveEditor.Utils.GUIUtils.showInTextArea;
@@ -105,7 +105,7 @@ public final class RotationButton extends BaseButton {
         super.mouseDragged(e);
         if (isControlNodeSelected) {
             totalAngle += rotation.rotateControlNode(e.getX(), e.getY(), 0);
-            getMapPanel().getRoadMap().refreshListeners();
+            getMapPanel().getRoadMap().refreshAllTableNodes();
             getMapPanel().repaint();
         }
     }
@@ -216,7 +216,7 @@ public final class RotationButton extends BaseButton {
         public void undo(){
             //rotation.setCentrePointWorld(this.centrePointWorld);
             rotation.rotateChanger(this.storedRotateNodeList, this.centrePointWorld, -this.angle);
-            getMapPanel().getRoadMap().refreshListeners();
+            getMapPanel().getRoadMap().refreshAllTableNodes();
             getMapPanel().repaint();
             setStale(this.isStale);
         }
@@ -224,7 +224,7 @@ public final class RotationButton extends BaseButton {
         public void redo(){
             rotation.setCentrePointWorld(this.centrePointWorld);
             rotation.rotateChanger(this.storedRotateNodeList, this.centrePointWorld, this.angle);
-            getMapPanel().getRoadMap().refreshListeners();
+            getMapPanel().getRoadMap().refreshAllTableNodes();
             getMapPanel().repaint();
             setStale(true);
         }
