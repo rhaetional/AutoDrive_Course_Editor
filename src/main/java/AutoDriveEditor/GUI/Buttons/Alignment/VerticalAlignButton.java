@@ -37,6 +37,6 @@ public class VerticalAlignButton extends AlignBaseButton {
         for (MapNode node : multiSelectList) {
             node.x = toNode.x;
         }
-        getMapPanel().getRoadMap().refreshAllTableNodes();
+        getMapPanel().getRoadMap().refreshTableNodeList(multiSelectList);
     }
 }

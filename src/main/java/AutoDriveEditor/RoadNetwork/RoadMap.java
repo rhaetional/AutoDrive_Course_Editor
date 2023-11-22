@@ -8,6 +8,7 @@ import java.util.ListIterator;
 import java.util.UUID;
 
 import static AutoDriveEditor.GUI.MenuBuilder.bDebugLogUndoRedo;
+import static AutoDriveEditor.MapPanel.MapPanel.getMapPanel;
 import static AutoDriveEditor.MapPanel.MapPanel.getYValueFromHeightMap;
 import static AutoDriveEditor.RoadNetwork.MapNode.NODE_FLAG_STANDARD;
 import static AutoDriveEditor.Utils.LoggerUtils.LOG;
@@ -122,6 +123,7 @@ public class RoadMap {
             mapNode.incoming.remove(toDelete);
             if (mapNode.id > toDelete.id) {
                 mapNode.id--;
+                getMapPanel().getRoadMap().refreshTableNode(mapNode);
             }
         }
 
@@ -148,11 +150,14 @@ public class RoadMap {
         pcs.addPropertyChangeListener(listener);
     }
 
-    //TODO: Replace getMapPanel().getRoadMap().refreshAllTableNodes(); with calls to refreshTableNode() wherever possible.
     public void refreshAllTableNodes() {
         pcs.firePropertyChange("networkNodesList.refreshList", null, networkNodesList);
     }
     public void refreshTableNode(MapNode node) {
         pcs.firePropertyChange("networkNodesList.refresh", null, node);
+    }
+
+    public void refreshTableNodeList(LinkedList<MapNode> multiSelectList) {
+        multiSelectList.forEach(this::refreshTableNode);
     }
 }

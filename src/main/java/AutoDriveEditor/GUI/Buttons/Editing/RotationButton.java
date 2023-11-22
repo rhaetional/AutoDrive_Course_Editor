@@ -105,7 +105,7 @@ public final class RotationButton extends BaseButton {
         super.mouseDragged(e);
         if (isControlNodeSelected) {
             totalAngle += rotation.rotateControlNode(e.getX(), e.getY(), 0);
-            getMapPanel().getRoadMap().refreshAllTableNodes();
+            getMapPanel().getRoadMap().refreshTableNodeList(multiSelectList);
             getMapPanel().repaint();
         }
     }
@@ -216,7 +216,7 @@ public final class RotationButton extends BaseButton {
         public void undo(){
             //rotation.setCentrePointWorld(this.centrePointWorld);
             rotation.rotateChanger(this.storedRotateNodeList, this.centrePointWorld, -this.angle);
-            getMapPanel().getRoadMap().refreshAllTableNodes();
+            getMapPanel().getRoadMap().refreshTableNodeList(multiSelectList);
             getMapPanel().repaint();
             setStale(this.isStale);
         }
@@ -224,7 +224,7 @@ public final class RotationButton extends BaseButton {
         public void redo(){
             rotation.setCentrePointWorld(this.centrePointWorld);
             rotation.rotateChanger(this.storedRotateNodeList, this.centrePointWorld, this.angle);
-            getMapPanel().getRoadMap().refreshAllTableNodes();
+            getMapPanel().getRoadMap().refreshTableNodeList(multiSelectList);
             getMapPanel().repaint();
             setStale(true);
         }

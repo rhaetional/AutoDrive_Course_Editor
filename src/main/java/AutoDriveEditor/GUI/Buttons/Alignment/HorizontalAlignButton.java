@@ -37,6 +37,6 @@ public class HorizontalAlignButton extends AlignBaseButton {
         for (MapNode node : multiSelectList) {
             node.z = toNode.z;
         }
-        getMapPanel().getRoadMap().refreshAllTableNodes();
+        getMapPanel().getRoadMap().refreshTableNodeList(multiSelectList);
     }
 }

@@ -279,7 +279,7 @@ public class ScanManager {
                     if (checkAreaForNodeOverlap(mergedNode) == 0) {
                         mergedNode.hasWarning = false;
                         mergedNode.warningNodes.clear();
-                        getMapPanel().getRoadMap().refreshAllTableNodes();
+                        getMapPanel().getRoadMap().refreshTableNode(mergedNode);
                         getMapPanel().repaint();
                     } else {
                         LOG.info("mapNode is still overlapping");

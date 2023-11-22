@@ -198,7 +198,6 @@ public class CopyPasteManager {
 
         changeManager.addChangeable( new PasteSelectionButton.PasteSelectionChanger(newNodes) );
         setStale(true);
-        getMapPanel().getRoadMap().refreshAllTableNodes();
         getMapPanel().repaint();
     }
 

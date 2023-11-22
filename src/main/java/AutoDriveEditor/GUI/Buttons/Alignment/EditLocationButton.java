@@ -75,7 +75,7 @@ public class EditLocationButton extends BaseButton {
             node.x = roundUpDoubleToDecimalPlaces(Double.parseDouble(posX.getText()), 3);
             node.y = roundUpDoubleToDecimalPlaces(Double.parseDouble(posY.getText()), 3);
             node.z = roundUpDoubleToDecimalPlaces(Double.parseDouble(posZ.getText()), 3);
-            getMapPanel().getRoadMap().refreshAllTableNodes();
+            getMapPanel().getRoadMap().refreshTableNode(node);
             getMapPanel().repaint();
         }
     }

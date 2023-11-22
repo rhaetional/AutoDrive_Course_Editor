@@ -57,8 +57,8 @@ public abstract class AlignBaseButton extends BaseButton {
                 storedNode.mapNode.x += storedNode.diffX;
                 storedNode.mapNode.y += storedNode.diffY;
                 storedNode.mapNode.z += storedNode.diffZ;
+                getMapPanel().getRoadMap().refreshTableNode(storedNode.mapNode);
             }
-            getMapPanel().getRoadMap().refreshAllTableNodes();
             getMapPanel().repaint();
             setStale(this.isStale);
         }
@@ -68,8 +68,8 @@ public abstract class AlignBaseButton extends BaseButton {
                 storedNode.mapNode.x -= storedNode.diffX;
                 storedNode.mapNode.y -= storedNode.diffY;
                 storedNode.mapNode.z -= storedNode.diffZ;
+                getMapPanel().getRoadMap().refreshTableNode(storedNode.mapNode);
             }
-            getMapPanel().getRoadMap().refreshAllTableNodes();
             getMapPanel().repaint();
             setStale(true);
         }
