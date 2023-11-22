@@ -118,6 +118,7 @@ public class AutoDriveEditor extends JFrame {
         this.add(GUIBuilder.createMapPanel(), BorderLayout.CENTER);
         this.add(GUIBuilder.createButtonPanel(mainLayout, layoutPosition), layoutPosition);
         this.add(GUIBuilder.initTextPanel(), BorderLayout.PAGE_END);
+        this.add(GUIBuilder.createRouteNodesTable(), BorderLayout.EAST);
 
         //MenuBuilder.editMenuEnabled(false);
         setIconImage(getTractorImage());

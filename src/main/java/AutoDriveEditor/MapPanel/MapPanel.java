@@ -1318,6 +1318,7 @@ public class MapPanel extends JPanel {
                         coordChanger.addCoordinateChange(node, 0, node.y, 0);
                         node.x = 0.0;
                         node.z = 0.0;
+                        roadMap.refreshTableNode(node);
                         //store first node found
                         if (firstMapNode==null)
                             firstMapNode = node;
@@ -1344,6 +1345,7 @@ public class MapPanel extends JPanel {
                     double heightMapY = getYValueFromHeightMap(node.x, node.z);
                     if (node.y == -1) {
                         node.y = heightMapY;
+                        roadMap.refreshTableNode(node);
                     }
                 }
             } else {

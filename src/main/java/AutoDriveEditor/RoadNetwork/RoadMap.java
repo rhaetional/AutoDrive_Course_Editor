@@ -1,11 +1,14 @@
 package AutoDriveEditor.RoadNetwork;
 
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
 import java.math.RoundingMode;
 import java.util.LinkedList;
 import java.util.ListIterator;
 import java.util.UUID;
 
 import static AutoDriveEditor.GUI.MenuBuilder.bDebugLogUndoRedo;
+import static AutoDriveEditor.MapPanel.MapPanel.getMapPanel;
 import static AutoDriveEditor.MapPanel.MapPanel.getYValueFromHeightMap;
 import static AutoDriveEditor.RoadNetwork.MapNode.NODE_FLAG_STANDARD;
 import static AutoDriveEditor.Utils.LoggerUtils.LOG;
@@ -17,9 +20,12 @@ public class RoadMap {
     public static LinkedList<MapNode> networkNodesList;
     public static UUID uuid;
 
+    private static PropertyChangeSupport pcs;
+
     public RoadMap() {
         networkNodesList = new LinkedList<>();
         mapName = null;
+        pcs = new PropertyChangeSupport(this);
 
         // generate a unique random UUID, we can use this to compare and detect when
         // a different config has been loaded.
@@ -48,17 +54,34 @@ public class RoadMap {
     public static MapNode createNewNetworkNode(double x, double z, int nodeType, boolean isSelected, boolean isControlNode) {
         MapNode createdNode = createMapNode(RoadMap.networkNodesList.size() + 1, x, z, nodeType, isSelected, isControlNode);
         RoadMap.networkNodesList.add(createdNode);
+        pcs.firePropertyChange("networkNodesList.add", null,createdNode);
         return createdNode;
     }
 
     public static MapNode createNewNetworkNode(double x, double y, double z, int nodeType, boolean isSelected, boolean isControlNode) {
         MapNode createdNode = createMapNode(RoadMap.networkNodesList.size() + 1, x, y, z, nodeType, isSelected, isControlNode);
         RoadMap.networkNodesList.add(createdNode);
+        pcs.firePropertyChange("networkNodesList.add", null,createdNode);
         return createdNode;
     }
 
     public static MapNode createControlNode(double x, double z) {
         return new MapNode(-99, x, 0, z, NODE_FLAG_STANDARD, false, true);
+    }
+
+    public static void addMapNode(MapNode newNode) {
+        networkNodesList.add(newNode);
+        pcs.firePropertyChange("networkNodesList.add", null,newNode);
+    }
+
+    public static void addAll(LinkedList<MapNode> nodes) {
+        networkNodesList.addAll(nodes);
+        pcs.firePropertyChange("networkNodesList.addAll", null, nodes);
+    }
+
+    public static void removeAll(LinkedList<MapNode> nodes) {
+        networkNodesList.removeAll(nodes);
+        pcs.firePropertyChange("networkNodesList.removeAll", nodes, null);
     }
 
     public void insertMapNode(MapNode toAdd, LinkedList<MapNode> otherNodesInList, LinkedList<MapNode> otherNodesOutList) {
@@ -77,6 +100,7 @@ public class RoadMap {
 
         if (bDebugLogUndoRedo) LOG.info("## insertMapNode() ## inserting index {} ( ID {} ) into mapNodes", toAdd.id - 1, toAdd.id );
         networkNodesList.add(toAdd.id -1 , toAdd);
+        pcs.firePropertyChange("networkNodesList.add", null,toAdd);
 
         //now we need to restore all the connections that went from/to it
 
@@ -99,10 +123,12 @@ public class RoadMap {
             mapNode.incoming.remove(toDelete);
             if (mapNode.id > toDelete.id) {
                 mapNode.id--;
+                getMapPanel().getRoadMap().refreshTableNode(mapNode);
             }
         }
 
         networkNodesList.remove(toDelete);
+        pcs.firePropertyChange("networkNodesList.remove", toDelete, null);
     }
 
     public static boolean isDual(MapNode start, MapNode target) {
@@ -115,8 +141,23 @@ public class RoadMap {
 
     // setters
 
-    @SuppressWarnings("AccessStaticViaInstance")
     public static void setRoadMapNodes(RoadMap roadMap, LinkedList<MapNode> mapNodes) {
-        roadMap.networkNodesList = mapNodes;
+        pcs.firePropertyChange("networkNodesList.replaceList", networkNodesList, mapNodes);
+        networkNodesList = mapNodes;
+    }
+
+    public void addPropertyChangeListener(PropertyChangeListener listener) {
+        pcs.addPropertyChangeListener(listener);
+    }
+
+    public void refreshAllTableNodes() {
+        pcs.firePropertyChange("networkNodesList.refreshList", null, networkNodesList);
+    }
+    public void refreshTableNode(MapNode node) {
+        pcs.firePropertyChange("networkNodesList.refresh", null, node);
+    }
+
+    public void refreshTableNodeList(LinkedList<MapNode> multiSelectList) {
+        multiSelectList.forEach(this::refreshTableNode);
     }
 }

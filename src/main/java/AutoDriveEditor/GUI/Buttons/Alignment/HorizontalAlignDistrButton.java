@@ -5,12 +5,12 @@ import AutoDriveEditor.RoadNetwork.MapNode;
 import AutoDriveEditor.Utils.Classes.CoordinateChanger;
 
 import javax.swing.*;
-
 import java.util.Comparator;
 
 import static AutoDriveEditor.AutoDriveEditor.changeManager;
 import static AutoDriveEditor.Locale.LocaleManager.getLocaleString;
 import static AutoDriveEditor.Managers.MultiSelectManager.multiSelectList;
+import static AutoDriveEditor.MapPanel.MapPanel.getMapPanel;
 import static AutoDriveEditor.Utils.GUIUtils.makeImageToggleButton;
 import static AutoDriveEditor.Utils.LoggerUtils.LOG;
 import static AutoDriveEditor.Utils.MathUtils.roundUpDoubleToDecimalPlaces;
@@ -81,6 +81,8 @@ public class HorizontalAlignDistrButton extends AlignBaseButton {
 
                 if (DEBUG) LOG.info("post HAD x: {} y: {} z: {}", node.x, node.y, node.z);
             }
+            //update table view
+            getMapPanel().getRoadMap().refreshTableNodeList(multiSelectList);
 
             changeManager.addChangeable(coordChange);
         }

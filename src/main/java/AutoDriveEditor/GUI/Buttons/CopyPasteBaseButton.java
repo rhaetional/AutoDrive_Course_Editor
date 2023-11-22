@@ -5,6 +5,7 @@ import AutoDriveEditor.MapPanel.MapPanel;
 import static AutoDriveEditor.Managers.MultiSelectManager.isMultipleSelected;
 import static AutoDriveEditor.Managers.MultiSelectManager.multiSelectList;
 import static AutoDriveEditor.MapPanel.MapPanel.cnpManager;
+import static AutoDriveEditor.MapPanel.MapPanel.getMapPanel;
 import static AutoDriveEditor.Utils.LoggerUtils.LOG;
 
 public abstract class CopyPasteBaseButton extends BaseButton {
@@ -12,6 +13,7 @@ public abstract class CopyPasteBaseButton extends BaseButton {
     public static void cutSelected() {
         if (isMultipleSelected && multiSelectList.size() > 0 ) {
             cnpManager.CutSelection(multiSelectList);
+            getMapPanel().getRoadMap().refreshTableNodeList(multiSelectList);
             MapPanel.getMapPanel().repaint();
 
         } else {

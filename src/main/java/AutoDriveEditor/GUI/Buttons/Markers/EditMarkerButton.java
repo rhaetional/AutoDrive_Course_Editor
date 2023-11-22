@@ -191,6 +191,7 @@ public class EditMarkerButton extends MarkerBaseButton {
         public void undo() {
             this.mapNode.setMarkerName(oldName);
             this.mapNode.setMarkerGroup(oldGroup);
+            getMapPanel().getRoadMap().refreshTableNode(mapNode);
             getMapPanel().repaint();
             setStale(this.isStale);
         }
@@ -198,6 +199,7 @@ public class EditMarkerButton extends MarkerBaseButton {
         public void redo() {
             this.mapNode.setMarkerName(this.newName);
             this.mapNode.setMarkerGroup(this.newGroup);
+            getMapPanel().getRoadMap().refreshTableNode(mapNode);
             getMapPanel().repaint();
             setStale(true);
         }

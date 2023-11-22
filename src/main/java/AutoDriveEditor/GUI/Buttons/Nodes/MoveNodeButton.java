@@ -17,7 +17,7 @@ import static AutoDriveEditor.GUI.Buttons.Curves.QuadCurveButton.isQuadCurveCrea
 import static AutoDriveEditor.GUI.Buttons.Curves.QuadCurveButton.quadCurve;
 import static AutoDriveEditor.GUI.MenuBuilder.bDebugLogUndoRedo;
 import static AutoDriveEditor.Locale.LocaleManager.getLocaleString;
-import static AutoDriveEditor.Managers.MultiSelectManager.*;
+import static AutoDriveEditor.Managers.MultiSelectManager.multiSelectList;
 import static AutoDriveEditor.Managers.ScanManager.checkAllNodesForOverlap;
 import static AutoDriveEditor.Managers.ScanManager.checkAreaForNodeOverlap;
 import static AutoDriveEditor.MapPanel.MapPanel.*;
@@ -174,6 +174,7 @@ public class MoveNodeButton extends BaseButton {
             }
         }
         canAutoSave = true;
+        getMapPanel().getRoadMap().refreshTableNodeList(nodeList);
         getMapPanel().repaint();
     }
 
@@ -203,6 +204,7 @@ public class MoveNodeButton extends BaseButton {
             for (MapNode node : this.moveNodes) {
                 checkAreaForNodeOverlap(node);
             }
+            getMapPanel().getRoadMap().refreshTableNodeList(moveNodes);
             getMapPanel().repaint();
             setStale(this.isStale);
         }
@@ -212,6 +214,7 @@ public class MoveNodeButton extends BaseButton {
             for (MapNode node : this.moveNodes) {
                 checkAreaForNodeOverlap(node);
             }
+            getMapPanel().getRoadMap().refreshTableNodeList(moveNodes);
             getMapPanel().repaint();
             setStale(true);
         }

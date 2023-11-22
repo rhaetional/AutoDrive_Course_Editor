@@ -8,6 +8,7 @@ import javax.swing.*;
 import static AutoDriveEditor.AutoDriveEditor.changeManager;
 import static AutoDriveEditor.Locale.LocaleManager.getLocaleString;
 import static AutoDriveEditor.Managers.MultiSelectManager.multiSelectList;
+import static AutoDriveEditor.MapPanel.MapPanel.getMapPanel;
 import static AutoDriveEditor.Utils.GUIUtils.makeImageToggleButton;
 import static AutoDriveEditor.Utils.LoggerUtils.LOG;
 
@@ -36,5 +37,6 @@ public class VerticalAlignButton extends AlignBaseButton {
         for (MapNode node : multiSelectList) {
             node.x = toNode.x;
         }
+        getMapPanel().getRoadMap().refreshTableNodeList(multiSelectList);
     }
 }

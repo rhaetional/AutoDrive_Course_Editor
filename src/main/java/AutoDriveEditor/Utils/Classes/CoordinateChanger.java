@@ -1,6 +1,5 @@
 package AutoDriveEditor.Utils.Classes;
 
-import AutoDriveEditor.GUI.Buttons.AlignBaseButton;
 import AutoDriveEditor.Managers.ChangeManager;
 import AutoDriveEditor.RoadNetwork.MapNode;
 
@@ -30,6 +29,8 @@ public class CoordinateChanger  implements ChangeManager.Changeable {
             storedNode.mapNode.x -= storedNode.diffX;
             storedNode.mapNode.y -= storedNode.diffY;
             storedNode.mapNode.z -= storedNode.diffZ;
+            //update table view
+            getMapPanel().getRoadMap().refreshTableNode(storedNode.mapNode);
         }
         getMapPanel().repaint();
         setStale(this.isStale);
@@ -40,6 +41,8 @@ public class CoordinateChanger  implements ChangeManager.Changeable {
             storedNode.mapNode.x += storedNode.diffX;
             storedNode.mapNode.y += storedNode.diffY;
             storedNode.mapNode.z += storedNode.diffZ;
+            //update table view
+            getMapPanel().getRoadMap().refreshTableNode(storedNode.mapNode);
         }
         getMapPanel().repaint();
         setStale(true);
