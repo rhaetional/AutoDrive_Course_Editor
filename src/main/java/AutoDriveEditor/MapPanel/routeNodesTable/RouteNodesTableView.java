@@ -34,6 +34,7 @@ public class RouteNodesTableView extends JPanel implements TableModelListener {
         }
     }
 
+    private final NodeFilterType defaultFilter = NodeFilterType.FILTER_MARKERS;
     private final RouteNodesTableModel nodesTableModel;
     private final RouteNodesTable nodesTableController;
     private final JTable nodesTable;
@@ -102,6 +103,7 @@ public class RouteNodesTableView extends JPanel implements TableModelListener {
 
         // FILTER
         this.add(filterButtonPanel, BorderLayout.NORTH);
+        filterButtonPanel.setSelectedFilter(defaultFilter);
 
         nodesTable.addMouseListener(new TableMouseAdapter());
     }
@@ -238,7 +240,6 @@ public class RouteNodesTableView extends JPanel implements TableModelListener {
             showMarkers.addActionListener(new FilterButtonListener());
             showParking.addActionListener(new FilterButtonListener());
 
-            showAll.setSelected(true);
         }
 
         /**
