@@ -7,6 +7,28 @@
         <body style="font-size:14;">
 
             <!------------------------->
+            <!-- Start version 1.0.6-rhae.2 -->
+            <!------------------------->
+
+            <h3 style="font-family:verdana;">Update to 1.0.6-rhae.2</h2>
+            <p><u>Added</u></p>
+            <ul>
+                <li>Align nodes horizontally/vertically and distribute them evenly along that axis.</li>
+                <li>Flip selected nodes across horizontal oder vertical axis.</li>
+                <li>Centre out-of-bounds nodes.</li>
+                <li>Table display of nodes for quick navigation and info.</li>
+            </ul>
+            <p><u>Changed</u></p>
+            <ul>
+                <li>Version check against this repository.</li>
+            </ul>
+            <p><u>Fixed</u></p>
+            <ul>
+                <li>Keep Vehicle Parking Destinations aligned with markers</li>
+                <li>Use platform specific file path delimiter.</li>
+            </ul>
+
+            <!------------------------->
             <!-- Start version 1.0.6 -->
             <!------------------------->
 
