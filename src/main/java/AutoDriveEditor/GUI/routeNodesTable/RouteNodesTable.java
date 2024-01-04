@@ -1,7 +1,7 @@
-package AutoDriveEditor.MapPanel.routeNodesTable;
+package AutoDriveEditor.GUI.routeNodesTable;
 // Packages to import
 
-import AutoDriveEditor.MapPanel.MapPanel;
+import AutoDriveEditor.GUI.MapPanel;
 import AutoDriveEditor.RoadNetwork.MapNode;
 
 import javax.swing.*;
@@ -9,7 +9,7 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.LinkedList;
 
-import static AutoDriveEditor.GUI.GUIBuilder.routeNodesTable;
+import static AutoDriveEditor.AutoDriveEditor.routeNodesTable;
 import static AutoDriveEditor.Utils.LoggerUtils.LOG;
 
 /**
