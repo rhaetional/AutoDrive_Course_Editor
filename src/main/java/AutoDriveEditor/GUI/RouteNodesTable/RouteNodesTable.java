@@ -9,6 +9,7 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.LinkedList;
 
+import static AutoDriveEditor.AutoDriveEditor.routeNodesTable;
 import static AutoDriveEditor.Utils.LoggerUtils.LOG;
 
 /**
@@ -39,6 +40,7 @@ public class RouteNodesTable implements PropertyChangeListener {
      * Loads LinkedList of MapNodes to the model
      * @param roadList MapNodes to be added to model
      */
+    //TODO: Remove LinkedList class
     public void loadRoadMap(LinkedList<MapNode> roadList) {
         if (roadList != null) {
             // Data to be displayed in the JTable

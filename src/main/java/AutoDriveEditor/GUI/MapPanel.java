@@ -1079,7 +1079,7 @@ public class MapPanel extends JPanel {
         g1.dispose();
     }
 
-    public void centreNodeInMapPanel(MapNode node) {
+    public static void centreNodeInMapPanel(MapNode node) {
         Point2D target = worldPosToScreenPos(node.x, node.z);
         double x = (this.getWidth() >> 1) - target.getX();
         double y = (this.getHeight() >> 1) - target.getY();

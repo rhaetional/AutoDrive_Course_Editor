@@ -5,6 +5,7 @@ import AutoDriveEditor.GUI.MapPanel;
 import AutoDriveEditor.GUI.Menus.EditorMenu;
 import AutoDriveEditor.GUI.RenderThreads.ConnectionDrawThread;
 import AutoDriveEditor.GUI.RenderThreads.NodeDrawThread;
+import AutoDriveEditor.GUI.RouteNodesTable.RouteNodesTable;
 import AutoDriveEditor.GUI.TextPanel;
 import AutoDriveEditor.Handlers.GlobalExceptionHandler;
 import AutoDriveEditor.Locale.LocaleManager;
@@ -40,6 +41,7 @@ public class AutoDriveEditor extends JFrame {
     public static AutoDriveEditor editor;
 
     public static MapPanel mapPanel;
+    public static RouteNodesTable routeNodesTable;
 
     public static ChangeManager changeManager;
     public static ButtonManager buttonManager;
@@ -124,13 +126,14 @@ public class AutoDriveEditor extends JFrame {
         multiSelectManager = new MultiSelectManager();
 
         mapPanel = new MapPanel();
+        routeNodesTable = new RouteNodesTable();
 
 
-        this.add(GUIBuilder.createRouteNodesTable(), BorderLayout.EAST);
         // Init menu bar
         setJMenuBar(new EditorMenu());
 
         add(mapPanel, BorderLayout.CENTER);
+        add(routeNodesTable.getView(), BorderLayout.EAST);
         add(new ButtonToolbar(mainLayout, layoutPosition), layoutPosition);
         add(new TextPanel(), BorderLayout.PAGE_END);
 

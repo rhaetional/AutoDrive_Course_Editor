@@ -75,11 +75,11 @@ public class MapNode  implements Comparable<MapNode> {
     public void createMapMarker(String newName, String newGroup) {
         if (bDebugLogMarkerInfo) LOG.info("Creating Map Marker for Node ID {} ( Name = {}, Group = {} )", this.id, newName, newGroup);
         this.mapMarker = new MapMarker(newName, newGroup, null, null);
-        this.mapMarker = new MapMarker(newName, newGroup, null);
     }
+    //TODO: Remove as unused?
     public void createMapMarker(String newName, String newGroup, List<Integer> newParkedVehiclesList) {
         if (bDebugLogMarkerInfo) LOG.info("Creating Map Marker for Node ID {} ( Name = {}, Group = {}, ParkingDestinationVehicleID = {} )", this.id, newName, newGroup, newParkedVehiclesList);
-        this.mapMarker = new MapMarker(newName, newGroup, newParkedVehiclesList);
+        this.mapMarker = new MapMarker(newName, newGroup, null, newParkedVehiclesList);
     }
 
     public void removeMapMarker() {
@@ -135,9 +135,6 @@ public class MapNode  implements Comparable<MapNode> {
     }
     public String getMarkerGroup() {
         return this.mapMarker.group;
-    }
-    public List<Integer> getParkedVehiclesList() {
-        return this.mapMarker.parkedVehiclesList;
     }
     public int getWarningType() { return this.warningType; }
     public boolean getPreviewNodeSelectionChange() { return this.showNodeSelectionPreview; }
@@ -276,10 +273,8 @@ public class MapNode  implements Comparable<MapNode> {
         public MapMarker (String name, String group, Integer mapMarkerID, List<Integer> parkedVehiclesList) {
             this.name = name;
             this.group = group;
-            // EXPERIMENTAL CODE
             this.mapMarkerID = mapMarkerID;
             this.parkedVehiclesList = parkedVehiclesList;
-            // END EXPERIMENTAL CODE
         }
     }
 }
