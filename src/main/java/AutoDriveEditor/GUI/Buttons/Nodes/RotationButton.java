@@ -1,8 +1,8 @@
-package AutoDriveEditor.GUI.Buttons.Editing;
+package AutoDriveEditor.GUI.Buttons.Nodes;
 
+import AutoDriveEditor.Classes.Rotation;
 import AutoDriveEditor.GUI.Buttons.BaseButton;
 import AutoDriveEditor.Managers.ChangeManager;
-import AutoDriveEditor.MapPanel.Rotation;
 import AutoDriveEditor.RoadNetwork.MapNode;
 import AutoDriveEditor.Utils.Classes.LabelNumberFilter;
 
@@ -13,16 +13,15 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 import java.awt.geom.Point2D;
 import java.util.LinkedList;
-import java.util.concurrent.locks.Lock;
 
 import static AutoDriveEditor.AutoDriveEditor.changeManager;
-import static AutoDriveEditor.GUI.MenuBuilder.bDebugLogUndoRedo;
+import static AutoDriveEditor.AutoDriveEditor.getMapPanel;
+import static AutoDriveEditor.GUI.MapPanel.*;
+import static AutoDriveEditor.GUI.Menus.DebugMenu.Logging.LogUndoRedoMenu.bDebugLogUndoRedo;
+import static AutoDriveEditor.GUI.TextPanel.showInTextArea;
 import static AutoDriveEditor.Locale.LocaleManager.getLocaleString;
 import static AutoDriveEditor.Managers.MultiSelectManager.multiSelectList;
-import static AutoDriveEditor.MapPanel.MapPanel.*;
 import static AutoDriveEditor.Utils.GUIUtils.makeImageToggleButton;
-import static AutoDriveEditor.Utils.GUIUtils.showInTextArea;
-import static AutoDriveEditor.Utils.ImageUtils.backBufferGraphics;
 import static AutoDriveEditor.Utils.LoggerUtils.LOG;
 import static AutoDriveEditor.XMLConfig.EditorXML.*;
 
@@ -49,7 +48,7 @@ public final class RotationButton extends BaseButton {
     public String getButtonPanel() { return "Edit"; }
 
     @Override
-    public Boolean ignoreMultiSelect() { return false; }
+    public Boolean useMultiSelection() { return true; }
 
     @Override
     public void setSelected(boolean selected) {
@@ -105,7 +104,6 @@ public final class RotationButton extends BaseButton {
         super.mouseDragged(e);
         if (isControlNodeSelected) {
             totalAngle += rotation.rotateControlNode(e.getX(), e.getY(), 0);
-            getMapPanel().getRoadMap().refreshTableNodeList(multiSelectList);
             getMapPanel().repaint();
         }
     }
@@ -121,6 +119,7 @@ public final class RotationButton extends BaseButton {
                 rotation.setInitialControlNodePosition(multiSelectList);
                 displayedRadius = rotation.getSelectionRadius(multiSelectList);
             }
+
         }
     }
 
@@ -146,11 +145,10 @@ public final class RotationButton extends BaseButton {
     }
 
     @Override
-    public void drawToScreen(Graphics2D g, Lock lock, double nodeSizeScaledQuarter, double scaledSizeHalf) {
-        super.drawToScreen(g, lock, nodeSizeScaledQuarter, scaledSizeHalf);
+    public void drawToScreen(Graphics g) {
         if (multiSelectList.size() > 0 && this.button.isSelected()) {
 
-            Graphics2D gTemp = (Graphics2D) backBufferGraphics.create();
+            Graphics2D gTemp = (Graphics2D) g.create();
             gTemp.setColor(Color.WHITE);
 
             Point2D controlNodePosition = worldPosToScreenPos(rotation.getControlNode().x, rotation.getControlNode().z);
@@ -161,7 +159,7 @@ public final class RotationButton extends BaseButton {
             Polygon p = new Polygon();
 
             if (hoveredNode == rotation.getControlNode()) {
-                double diff = nodeSizeScaledQuarter + ((scaledSizeHalf - nodeSizeScaledQuarter) / 2);
+                double diff = nodeSizeScaledHalf + ((nodeSizeScaled - nodeSizeScaledHalf) / 2);
                 p.addPoint((int) controlNodePosition.getX(), (int) (controlNodePosition.getY() - diff));
                 p.addPoint((int) (controlNodePosition.getX() + diff), (int) controlNodePosition.getY());
                 p.addPoint((int) controlNodePosition.getX(), (int) (controlNodePosition.getY() + diff));
@@ -171,10 +169,10 @@ public final class RotationButton extends BaseButton {
             }
 
             p.reset();
-            p.addPoint((int) controlNodePosition.getX(), (int) (controlNodePosition.getY() - nodeSizeScaledQuarter));
-            p.addPoint((int) (controlNodePosition.getX() + nodeSizeScaledQuarter), (int) controlNodePosition.getY());
-            p.addPoint((int) controlNodePosition.getX(), (int) (controlNodePosition.getY() + nodeSizeScaledQuarter));
-            p.addPoint((int) (controlNodePosition.getX() - nodeSizeScaledQuarter), (int) controlNodePosition.getY());
+            p.addPoint((int) controlNodePosition.getX(), (int) (controlNodePosition.getY() - nodeSizeScaledHalf));
+            p.addPoint((int) (controlNodePosition.getX() + nodeSizeScaledHalf), (int) controlNodePosition.getY());
+            p.addPoint((int) controlNodePosition.getX(), (int) (controlNodePosition.getY() + nodeSizeScaledHalf));
+            p.addPoint((int) (controlNodePosition.getX() - nodeSizeScaledHalf), (int) controlNodePosition.getY());
             gTemp.setColor(colourNodeControl);
             gTemp.fillPolygon(p);
 
@@ -216,7 +214,6 @@ public final class RotationButton extends BaseButton {
         public void undo(){
             //rotation.setCentrePointWorld(this.centrePointWorld);
             rotation.rotateChanger(this.storedRotateNodeList, this.centrePointWorld, -this.angle);
-            getMapPanel().getRoadMap().refreshTableNodeList(multiSelectList);
             getMapPanel().repaint();
             setStale(this.isStale);
         }
@@ -224,7 +221,6 @@ public final class RotationButton extends BaseButton {
         public void redo(){
             rotation.setCentrePointWorld(this.centrePointWorld);
             rotation.rotateChanger(this.storedRotateNodeList, this.centrePointWorld, this.angle);
-            getMapPanel().getRoadMap().refreshTableNodeList(multiSelectList);
             getMapPanel().repaint();
             setStale(true);
         }

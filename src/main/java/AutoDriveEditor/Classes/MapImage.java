@@ -1,4 +1,4 @@
-package AutoDriveEditor.MapPanel;
+package AutoDriveEditor.Classes;
 
 import AutoDriveEditor.AutoDriveEditor;
 import AutoDriveEditor.RoadNetwork.MapNode;
@@ -18,18 +18,17 @@ import java.nio.file.Paths;
 import java.util.LinkedList;
 import java.util.Objects;
 
-import static AutoDriveEditor.AutoDriveEditor.EXPERIMENTAL;
-import static AutoDriveEditor.AutoDriveEditor.editor;
-import static AutoDriveEditor.GUI.GUIBuilder.*;
-import static AutoDriveEditor.GUI.MenuBuilder.*;
+import static AutoDriveEditor.AutoDriveEditor.*;
+import static AutoDriveEditor.GUI.MapPanel.*;
+import static AutoDriveEditor.GUI.Menus.DebugMenu.Logging.LogFileIOMenu.bDebugLogFileIO;
+import static AutoDriveEditor.GUI.Menus.EditorMenu.heightmapMenuEnabled;
+import static AutoDriveEditor.GUI.Menus.EditorMenu.mapMenuEnabled;
+import static AutoDriveEditor.GUI.TextPanel.*;
 import static AutoDriveEditor.Locale.LocaleManager.getLocaleString;
-import static AutoDriveEditor.MapPanel.MapPanel.*;
 import static AutoDriveEditor.Utils.FileUtils.*;
-import static AutoDriveEditor.Utils.GUIUtils.showInTextArea;
 import static AutoDriveEditor.Utils.ImageUtils.getNewBufferImage;
 import static AutoDriveEditor.Utils.LoggerUtils.LOG;
-import static AutoDriveEditor.Utils.MathUtils.roundUpFloatToDecimalPlaces;
-import static AutoDriveEditor.XMLConfig.EditorXML.*;
+import static AutoDriveEditor.XMLConfig.EditorXML.bUseOnlineMapImages;
 import static AutoDriveEditor.XMLConfig.GameXML.*;
 import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 
@@ -57,34 +56,27 @@ public class MapImage {
 
                 try {
                     imageInfo = new SimpleImageInfo(new File(location));
-                    if (EXPERIMENTAL) {
-                        pdaImage = new BufferedImage(imageInfo.getWidth(), imageInfo.getHeight(), BufferedImage.TYPE_USHORT_565_RGB);
-                    } else {
-                        pdaImage = getNewBufferImage(imageInfo.getWidth(), imageInfo.getHeight(), Transparency.OPAQUE);
-                    }
-
+                    pdaImage = getNewBufferImage(imageInfo.getWidth(), imageInfo.getHeight(), Transparency.OPAQUE);
                     try {
                         loadedImage = ImageIO.read(new File(location));
                         Graphics2D g = (Graphics2D) pdaImage.getGraphics();
                         g.drawImage(loadedImage, 0, 0, loadedImage.getWidth(), loadedImage.getHeight(), null);
                         g.dispose();
-                        imageLoadedLabel.setForeground(new Color(0, 100, 0));
-                        imageLoadedLabel.setText("Loaded");
+                        setImageLoadedLabel("Loaded", new Color(0, 100, 0));
                         setImage(pdaImage, false);
                     } catch (IOException ignored) {}
                 } catch (IOException ignored) {}
             } else {
+                LOG.info(getLocaleString("console_editor_no_map"));
+                useDefaultMapImage();
+                forceMapImageRedraw();
                 if (configType == CONFIG_SAVEGAME) {
                     JOptionPane.showMessageDialog(editor, getLocaleString("dialog_gamexml_mapimage_not_found_message"), getLocaleString("dialog_mapimage_not_found_title"), JOptionPane.ERROR_MESSAGE);
                 } else if (configType == CONFIG_ROUTEMANAGER) {
                     JOptionPane.showMessageDialog(editor, getLocaleString("dialog_routexml_mapimage_not_found_message"), getLocaleString("dialog_mapimage_not_found_title"), JOptionPane.ERROR_MESSAGE);
                 }
-                LOG.info(getLocaleString("console_editor_no_map"));
-                useDefaultMapImage();
-                imageLoadedLabel.setForeground(new Color(200,0,0));
-                imageLoadedLabel.setText("Not Found");
+                setImageLoadedLabel("Not Found", new Color(200,0,0));
             }
-            getMapPanel().repaint();
             mapMenuEnabled(true);
         }
     }
@@ -101,16 +93,14 @@ public class MapImage {
             Graphics2D g = (Graphics2D) heightMapImage.getGraphics();
             g.drawImage(loadedImage, 0, 0, loadedImage.getWidth(), loadedImage.getHeight(), null);
             g.dispose();
-            heightMapLoadedLabel.setForeground(new Color(150,100,20));
-            heightMapLoadedLabel.setText("Manual Load");
+            setHeightMapLoadedLabel("Manual Load", new Color(150,100,20));
 
             heightmapMenuEnabled(true);
             heightMapScale = calculateHeightMapScaling();
             LOG.info("HeightMap Scale = {}", heightMapScale);
             getMapPanel().repaint();
         } catch (IOException e) {
-            heightMapLoadedLabel.setForeground(new Color(200,0,0));
-            heightMapLoadedLabel.setText("Not Found");
+            setHeightMapLoadedLabel("Not Found", new Color(200,0,0));
             showInTextArea(getLocaleString("dialog_mapimage_not_found_title"), true, true);
             throw new RuntimeException(e);
         }
@@ -123,8 +113,6 @@ public class MapImage {
         if (mapName != null) {
             LOG.info("-----------------------------------------");
             LOG.info("Loading HeightMap..... ");
-
-
             try {
                 //check if the file is in the same location as config file
                 configPath = removeFilenameFromString(xmlConfigFile.toString());
@@ -156,8 +144,7 @@ public class MapImage {
                         Graphics2D g = (Graphics2D) heightMapImage.getGraphics();
                         g.drawImage(loadedImage, 0, 0, loadedImage.getWidth(), loadedImage.getHeight(), null);
                         g.dispose();
-                        heightMapLoadedLabel.setForeground(new Color(0, 100, 0));
-                        heightMapLoadedLabel.setText("Loaded");
+                        setHeightMapLoadedLabel("Loaded", new Color(0, 100, 0));
 
                         heightmapMenuEnabled(true);
                         heightMapScale = calculateHeightMapScaling();
@@ -169,8 +156,7 @@ public class MapImage {
             } else {
                 LOG.info("Failed to load HeightMap");
                 heightMapScale = 1;
-                heightMapLoadedLabel.setForeground(new Color(200,0,0));
-                heightMapLoadedLabel.setText("Not Found");
+                setHeightMapLoadedLabel("Not Found", Color.RED);
                 heightmapMenuEnabled(true);
                 if (configType == CONFIG_SAVEGAME) {
                     JOptionPane.showMessageDialog(editor, getLocaleString("dialog_heightmap_not_found_game"), getLocaleString("dialog_heightmap_not_found_title"), JOptionPane.ERROR_MESSAGE);
@@ -349,7 +335,12 @@ public class MapImage {
         URL url = AutoDriveEditor.class.getResource(fullPath);
         if (url != null) {
             try {
-                pdaImage = ImageIO.read(url);
+                //SimpleImageInfo imageInfo = new SimpleImageInfo(new File(url.getFile()));
+                pdaImage = getNewBufferImage(2048, 2048, Transparency.OPAQUE);
+                BufferedImage tempBuffer = ImageIO.read(url);
+                Graphics2D g = (Graphics2D) pdaImage.getGraphics();
+                g.drawImage(tempBuffer, 0, 0, pdaImage.getWidth(), pdaImage.getHeight(), null);
+                g.dispose();
                 setImage(pdaImage, false);
             } catch (IOException e) {
                 e.printStackTrace();
@@ -357,9 +348,14 @@ public class MapImage {
         }
     }
 
+    @SuppressWarnings("unused")
     public static BufferedImage getMapPanelImage() {
-        return mapPanelImage;
+        return pdaImage;
     }
+
+    // TODO:-   eliminate mapPanelImage entirely, will need to change how the
+    //          map image is loaded so pdaImage is a scaled down version of
+    //          the original file.
 
     public static void setImage(BufferedImage image, Boolean scaleToCorrectSize) {
         if (image != null) {
@@ -391,129 +387,8 @@ public class MapImage {
             Graphics2D g2d = (Graphics2D) mapPanelImage.getGraphics();
             g2d.drawImage(image, 0, 0, null);
             g2d.dispose();
-        }
-    }
-
-    public static void checkStoredMapInfoFor(String mapName) {
-        boolean isKnown = false;
-        if (mapName != null) {
-            for (int i = 0; i <= knownMapList.size() - 1; i++) {
-                MapInfoStore store = knownMapList.get(i);
-                if (store.mapName.equals(mapName)) {
-                    LOG.info("Found previously used settings for map ( {} ), applying them now", mapName);
-                    updateMapScaleTo(store.zoomFactor);
-                    LOG.info("  --> updating map scale to {}x", store.zoomFactor);
-                    updateNodeSizeTo(store.nodeSize);
-                    LOG.info("  --> updating node size to {}x", nodeSize);
-                    isKnown = true;
-                    break;
-                }
-            }
         } else {
-            LOG.info("## WARNING ## - Map name is 'null', this should not happen, setting map panel to 1x map scale and 2.0 node size");
-            updateSelectedMapScaleMenuTo(1);
-            updateMapScaleTo(1);
-            updateNodeSizeTo(2f);
+            LOG.info("## setImage() ## image = null");
         }
-
-        if (!isKnown && mapName != null) {
-            LOG.info("No previous settings found for Map ( {} ), storing new map with initial settings of 1x map scale / node size of 2.0", mapName);
-            knownMapList.add(new MapInfoStore(mapName, 1, 2f));
-            currentMapSizeLabel.setText("2km");
-            nodeSize = 2f;
-        }
-    }
-
-    public static void updateSelectedMapScaleMenuTo(int zoomFactor) {
-        if (zoomFactor == 1) {
-            zoom2km.setSelected(true);
-        } else if (zoomFactor == 2) {
-            zoom4km.setSelected(true);
-        } else if (zoomFactor == 3) {
-            zoom6km.setSelected(true);
-        } else if (zoomFactor == 4) {
-            zoom8km.setSelected(true);
-        } else if (zoomFactor == 5) {
-            zoom10km.setSelected(true);
-        } else if (zoomFactor == 6) {
-            zoom12km.setSelected(true);
-        } else if (zoomFactor == 7) {
-            zoom14km.setSelected(true);
-        } else if (zoomFactor == 8) {
-            zoom16km.setSelected(true);
-        } else if (zoomFactor == 9) {
-            zoom18km.setSelected(true);
-        } else if (zoomFactor == 10) {
-            zoom20km.setSelected(true);
-        } else if (zoomFactor == 11) {
-            zoom22km.setSelected(true);
-        } else if (zoomFactor == 12) {
-            zoom24km.setSelected(true);
-        } else if (zoomFactor == 13) {
-            zoom26km.setSelected(true);
-        } else if (zoomFactor == 14) {
-            zoom28km.setSelected(true);
-        } else if (zoomFactor == 15) {
-            zoom30km.setSelected(true);
-        } else if (zoomFactor == 16) {
-            zoom32km.setSelected(true);
-        } else if (zoomFactor == 17) {
-            zoom34km.setSelected(true);
-        } else if (zoomFactor == 18) {
-            zoom36km.setSelected(true);
-        } else if (zoomFactor == 19) {
-            zoom38km.setSelected(true);
-        } else if (zoomFactor == 20) {
-            zoom40km.setSelected(true);
-        } else if (zoomFactor == 21) {
-            zoom42km.setSelected(true);
-        } else if (zoomFactor == 22) {
-            zoom44km.setSelected(true);
-        } else if (zoomFactor == 23) {
-            zoom46km.setSelected(true);
-        }
-        currentMapSizeLabel.setText("" + zoomFactor *2 + "km");
-    }
-
-    public static void updateStoredMapScale(String mapName, int zoomFactor) {
-        if (mapName != null) {
-            for (int i = 0; i <= knownMapList.size() - 1; i++) {
-                MapInfoStore store = knownMapList.get(i);
-                if (store.mapName.equals(mapName)) {
-                    store.zoomFactor = zoomFactor;
-                    break;
-                }
-            }
-        }
-    }
-
-    public static void updateStoredMapNodeSize(String mapName, float nodeSize) {
-        if (mapName != null) {
-            for (int i = 0; i <= knownMapList.size() - 1; i++) {
-                MapInfoStore store = knownMapList.get(i);
-                if (store.mapName.equals(mapName)) {
-                    store.nodeSize = nodeSize;
-                    break;
-                }
-            }
-        }
-    }
-
-    public static void updateMapScaleTo(int zoomFactor) {
-        if (roadMap != null) {
-            getMapPanel().setMapZoomFactor(zoomFactor);
-            updateSelectedMapScaleMenuTo(zoomFactor);
-            updateStoredMapScale(RoadMap.mapName, zoomFactor);
-            getMapPanel().repaint();
-        }
-    }
-
-    public static void updateNodeSizeTo(float newNodeSize) {
-        if (roadMap != null) {
-            nodeSize = roundUpFloatToDecimalPlaces(newNodeSize, 1);
-            updateStoredMapNodeSize(RoadMap.mapName, nodeSize);
-            getMapPanel().repaint();
-        }
-
     }
 }

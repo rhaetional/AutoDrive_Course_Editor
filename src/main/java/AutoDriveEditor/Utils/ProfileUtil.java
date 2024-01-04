@@ -1,20 +1,24 @@
 package AutoDriveEditor.Utils;
 
-public class ProfileUtils {
+import java.math.RoundingMode;
 
-    private static long time;
-    private static long startTime = 0;
+import static AutoDriveEditor.Utils.MathUtils.limitDoubleToDecimalPlaces;
 
-    public ProfileUtils() {
-        time = 0;
+public class ProfileUtil {
+
+    private long time;
+    private long startTime = 0;
+
+    public ProfileUtil() {
+        this.time = 0;
     }
 
     public void startTimer() {
-        startTime = System.currentTimeMillis();
+        this.startTime = System.nanoTime();
     }
 
     public void pauseTimer() {
-        time += System.currentTimeMillis() - startTime;
+        this.time += System.nanoTime() - this.startTime;
     }
 
     public void restartTimer() {
@@ -26,11 +30,11 @@ public class ProfileUtils {
     }
 
     public void resetTimer() {
-        time = 0;
+        this.time = 0;
     }
 
-    public long getTime() {
-        return time;
+    public double getTime(int decimalPrecision) {
+        return limitDoubleToDecimalPlaces((double)this.time / 1000000, decimalPrecision , RoundingMode.HALF_UP);
     }
 }
 

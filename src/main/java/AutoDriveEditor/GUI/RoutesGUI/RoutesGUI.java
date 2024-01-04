@@ -1,6 +1,6 @@
-package AutoDriveEditor.GUI;
+package AutoDriveEditor.GUI.RoutesGUI;
 
-import AutoDriveEditor.MapPanel.MapPanel;
+import AutoDriveEditor.GUI.MapPanel;
 import AutoDriveEditor.XMLConfig.RoutesXML;
 
 import javax.swing.*;
@@ -11,7 +11,7 @@ import java.io.File;
 import java.util.LinkedList;
 
 import static AutoDriveEditor.AutoDriveEditor.editor;
-import static AutoDriveEditor.GUI.GUIImages.getTractorImage;
+import static AutoDriveEditor.GUI.EditorImages.getTractorImage;
 import static AutoDriveEditor.Locale.LocaleManager.getLocaleString;
 import static AutoDriveEditor.Utils.GUIUtils.makeBasicButton;
 import static AutoDriveEditor.Utils.LoggerUtils.LOG;

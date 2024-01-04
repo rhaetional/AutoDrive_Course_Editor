@@ -1,4 +1,4 @@
-package AutoDriveEditor.MapPanel;
+package AutoDriveEditor.Classes;
 
 import AutoDriveEditor.RoadNetwork.MapNode;
 
@@ -7,15 +7,18 @@ import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
 import java.util.LinkedList;
 
+import static AutoDriveEditor.AutoDriveEditor.getMapPanel;
 import static AutoDriveEditor.GUI.Buttons.Curves.CubicCurveButton.cubicCurve;
 import static AutoDriveEditor.GUI.Buttons.Curves.CubicCurveButton.isCubicCurveCreated;
 import static AutoDriveEditor.GUI.Buttons.Curves.QuadCurveButton.isQuadCurveCreated;
 import static AutoDriveEditor.GUI.Buttons.Curves.QuadCurveButton.quadCurve;
+import static AutoDriveEditor.GUI.MapPanel.*;
 import static AutoDriveEditor.Managers.CopyPasteManager.*;
 import static AutoDriveEditor.Managers.MultiSelectManager.multiSelectList;
-import static AutoDriveEditor.MapPanel.MapPanel.*;
 import static AutoDriveEditor.RoadNetwork.RoadMap.createControlNode;
 import static AutoDriveEditor.Utils.MathUtils.roundUpDoubleToDecimalPlaces;
+import static AutoDriveEditor.XMLConfig.AutoSave.resumeAutoSaving;
+import static AutoDriveEditor.XMLConfig.AutoSave.suspendAutoSaving;
 import static AutoDriveEditor.XMLConfig.EditorXML.nodeSize;
 import static java.lang.Math.PI;
 
@@ -33,15 +36,15 @@ public class Rotation {
     }
 
     public void rotateSelected(LinkedList<MapNode> list, double angle) {
-        canAutoSave = false;
-        Point2D selectionCentre = getCentrePointWorld();
+        suspendAutoSaving();
+        Point2D selectionCentre = centrePointWorld;
         for (MapNode node : list) {
             rotatePoint(node, selectionCentre, angle);
         }
         if (isQuadCurveCreated) quadCurve.updateCurve();
         if (isCubicCurveCreated) cubicCurve.updateCurve();
-        canAutoSave = true;
         getMapPanel().repaint();
+        resumeAutoSaving();
     }
 
     public void rotateChanger(LinkedList<MapNode> list, Point2D centrePointWorld, int degrees) {

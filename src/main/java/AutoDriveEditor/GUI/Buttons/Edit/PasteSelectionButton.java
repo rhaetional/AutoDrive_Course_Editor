@@ -1,4 +1,4 @@
-package AutoDriveEditor.GUI.Buttons.Editing;
+package AutoDriveEditor.GUI.Buttons.Edit;
 
 import AutoDriveEditor.GUI.Buttons.CopyPasteBaseButton;
 import AutoDriveEditor.Managers.ChangeManager;
@@ -7,11 +7,14 @@ import AutoDriveEditor.RoadNetwork.RoadMap;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
+import java.util.ArrayList;
 import java.util.LinkedList;
 
-import static AutoDriveEditor.GUI.MenuBuilder.bDebugLogCopyPasteInfo;
+import static AutoDriveEditor.AutoDriveEditor.getMapPanel;
+import static AutoDriveEditor.GUI.MapPanel.isStale;
+import static AutoDriveEditor.GUI.MapPanel.setStale;
+import static AutoDriveEditor.GUI.Menus.DebugMenu.Logging.LogCopyPasteMenu.bDebugLogCopyPasteInfo;
 import static AutoDriveEditor.Managers.MultiSelectManager.clearMultiSelection;
-import static AutoDriveEditor.MapPanel.MapPanel.*;
 import static AutoDriveEditor.Utils.GUIUtils.makeImageButton;
 import static AutoDriveEditor.Utils.LoggerUtils.LOG;
 
@@ -31,7 +34,7 @@ public class PasteSelectionButton extends CopyPasteBaseButton {
     public String getButtonPanel() { return "Edit"; }
 
     @Override
-    public Boolean ignoreDeselect() { return true; }
+    public Boolean ignoreButtonDeselect() { return true; }
 
     @Override
     public void actionPerformed(ActionEvent e) {
@@ -45,13 +48,13 @@ public class PasteSelectionButton extends CopyPasteBaseButton {
     //
 
     public static class  PasteSelectionChanger implements ChangeManager.Changeable {
-        private final LinkedList<MapNode> storeNodes;
+        //private final LinkedList<MapNode> storeNodes;
+        private final ArrayList<MapNode> storeNodes;
         private final boolean isStale;
 
         public PasteSelectionChanger(LinkedList<MapNode> nodes){
             super();
-            //noinspection unchecked
-            this.storeNodes = (LinkedList<MapNode>) nodes.clone();
+            this.storeNodes = new ArrayList<>(nodes);
             this.isStale = isStale();
         }
 

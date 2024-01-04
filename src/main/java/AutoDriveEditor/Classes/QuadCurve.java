@@ -1,7 +1,6 @@
-package AutoDriveEditor.MapPanel;
+package AutoDriveEditor.Classes;
 
 import AutoDriveEditor.GUI.Buttons.CurveBaseButton;
-import AutoDriveEditor.GUI.GUIBuilder;
 import AutoDriveEditor.RoadNetwork.MapNode;
 
 import java.awt.geom.Point2D;
@@ -9,20 +8,24 @@ import java.util.LinkedList;
 
 import static AutoDriveEditor.AutoDriveEditor.buttonManager;
 import static AutoDriveEditor.AutoDriveEditor.changeManager;
-import static AutoDriveEditor.GUI.MenuBuilder.bDebugLogCurveInfo;
+import static AutoDriveEditor.GUI.Buttons.LinerLineBaseButton.*;
+import static AutoDriveEditor.GUI.Curves.CurvePanel.*;
+import static AutoDriveEditor.GUI.MapPanel.*;
+import static AutoDriveEditor.GUI.Menus.DebugMenu.Logging.LogCurveInfoMenu.bDebugLogCurveInfo;
 import static AutoDriveEditor.Listeners.MouseListener.prevMousePosX;
 import static AutoDriveEditor.Listeners.MouseListener.prevMousePosY;
-import static AutoDriveEditor.MapPanel.MapPanel.*;
 import static AutoDriveEditor.RoadNetwork.MapNode.*;
 import static AutoDriveEditor.RoadNetwork.RoadMap.createMapNode;
 import static AutoDriveEditor.RoadNetwork.RoadMap.createNewNetworkNode;
 import static AutoDriveEditor.Utils.LoggerUtils.LOG;
 import static AutoDriveEditor.Utils.MathUtils.roundUpDoubleToDecimalPlaces;
+import static AutoDriveEditor.XMLConfig.AutoSave.resumeAutoSaving;
+import static AutoDriveEditor.XMLConfig.AutoSave.suspendAutoSaving;
 import static AutoDriveEditor.XMLConfig.EditorXML.*;
 
 public class QuadCurve {
 
-    public LinkedList<MapNode> curveNodesList;
+    public final LinkedList<MapNode> curveNodesList;
     private MapNode curveStartNode;
     private MapNode curveEndNode;
     private MapNode controlPoint1;
@@ -36,15 +39,15 @@ public class QuadCurve {
         this.curveNodesList = new LinkedList<>();
         this.curveStartNode = startNode;
         this.curveEndNode = endNode;
-        this.numInterpolationPoints = GUIBuilder.numIterationsSlider.getValue();
+        this.numInterpolationPoints = numIterationsSlider.getValue();
         if (this.numInterpolationPoints < 2) this.numInterpolationPoints = 2;
         this.controlPoint1 = createMapNode(0, startNode.x, 0, endNode.z, NODE_FLAG_CONTROL_POINT, false, true);
         this.virtualControlPoint1 = new Point2D.Double(controlPoint1.x, controlPoint1.z);
-        this.isReversePath = GUIBuilder.curvePathReverse.isSelected();
-        this.isDualPath = GUIBuilder.curvePathDual.isSelected();
-        this.nodeType = GUIBuilder.curvePathRegular.isSelected() ? NODE_FLAG_STANDARD : NODE_FLAG_SUBPRIO;
+        this.isReversePath = curvePathReverse.isSelected();
+        this.isDualPath = curvePathDual.isSelected();
+        this.nodeType = curvePathRegular.isSelected() ? NODE_FLAG_REGULAR : NODE_FLAG_SUBPRIO;
         this.updateCurve();
-        GUIBuilder.curveOptionsPanel.setVisible(true);
+        curveOptionsPanel.setVisible(true);
     }
 
     public void setNumInterpolationPoints(int points) {
@@ -101,7 +104,8 @@ public class QuadCurve {
     }
 
     public void commitCurve() {
-        canAutoSave = false;
+
+        suspendAutoSaving();
 
         LinkedList<MapNode> mergeNodesList = new LinkedList<>();
 
@@ -129,13 +133,13 @@ public class QuadCurve {
         changeManager.addChangeable(new CurveBaseButton.CurveChanger(mergeNodesList, isReversePath, isDualPath));
         connectNodes(mergeNodesList, isReversePath, isDualPath);
 
-        canAutoSave = true;
+        resumeAutoSaving();
 
         if (bDebugLogCurveInfo) LOG.info("QuadCurve created {} nodes", mergeNodesList.size() - 2);
     }
 
     public static void connectNodes(LinkedList<MapNode> mergeNodesList, boolean reversePath, boolean dualPath) {
-        canAutoSave = false;
+        suspendAutoSaving();
         for (int j = 0; j < mergeNodesList.size() - 1; j++) {
             MapNode startNode = mergeNodesList.get(j);
             MapNode endNode = mergeNodesList.get(j + 1);
@@ -147,7 +151,7 @@ public class QuadCurve {
                 createConnectionBetween(startNode, endNode, CONNECTION_STANDARD);
             }
         }
-        canAutoSave = true;
+        resumeAutoSaving();
     }
 
     public void clear() {
@@ -201,8 +205,8 @@ public class QuadCurve {
             scaledDiffY = newY - node.z;
 
         } else {
-            scaledDiffX = roundUpDoubleToDecimalPlaces((diffX * mapZoomFactor) / zoomLevel, 3);
-            scaledDiffY = roundUpDoubleToDecimalPlaces((diffY * mapZoomFactor) / zoomLevel, 3);
+            scaledDiffX = roundUpDoubleToDecimalPlaces((diffX * mapScale) / zoomLevel, 3);
+            scaledDiffY = roundUpDoubleToDecimalPlaces((diffY * mapScale) / zoomLevel, 3);
         }
         return new Point2D.Double(scaledDiffX, scaledDiffY);
     }
