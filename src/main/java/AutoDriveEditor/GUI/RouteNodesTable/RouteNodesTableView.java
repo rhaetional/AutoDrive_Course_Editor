@@ -1,4 +1,4 @@
-package AutoDriveEditor.GUI.routeNodesTable;
+package AutoDriveEditor.GUI.RouteNodesTable;
 
 import AutoDriveEditor.RoadNetwork.MapNode;
 

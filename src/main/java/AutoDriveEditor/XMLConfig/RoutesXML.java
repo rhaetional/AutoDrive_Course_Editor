@@ -325,6 +325,7 @@ public class RoutesXML {
             }
         }
         RoadMap roadMap = new RoadMap();
+        roadMap.addPropertyChangeListener(getRouteNodesTable());
         setRoadMapNodes(roadMap, new LinkedList<>(nodes));
         return roadMap;
     }

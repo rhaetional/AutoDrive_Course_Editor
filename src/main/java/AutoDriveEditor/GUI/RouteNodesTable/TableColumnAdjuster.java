@@ -1,4 +1,4 @@
-package AutoDriveEditor.GUI.routeNodesTable;
+package AutoDriveEditor.MapPanel.routeNodesTable;
 
 import javax.swing.*;
 import javax.swing.event.TableModelEvent;

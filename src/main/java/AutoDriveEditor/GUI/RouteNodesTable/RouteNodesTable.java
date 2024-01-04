@@ -1,4 +1,4 @@
-package AutoDriveEditor.GUI.routeNodesTable;
+package AutoDriveEditor.GUI.RouteNodesTable;
 // Packages to import
 
 import AutoDriveEditor.GUI.MapPanel;
@@ -9,7 +9,6 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.LinkedList;
 
-import static AutoDriveEditor.AutoDriveEditor.routeNodesTable;
 import static AutoDriveEditor.Utils.LoggerUtils.LOG;
 
 /**

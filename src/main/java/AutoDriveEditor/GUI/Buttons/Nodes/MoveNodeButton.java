@@ -197,6 +197,7 @@ public class MoveNodeButton extends BaseButton {
             }
             checkNodeOverlap(node);
         }
+        getMapPanel().getRoadMap().refreshTableNodeList(nodeList);
         getMapPanel().repaint();
         resumeAutoSaving();
     }
@@ -226,6 +227,7 @@ public class MoveNodeButton extends BaseButton {
             for (MapNode node : this.moveNodes) {
                 checkAreaForNodeOverlap(node);
             }
+            getMapPanel().getRoadMap().refreshTableNodeList(moveNodes);
             getMapPanel().repaint();
             setStale(this.isStale);
         }
@@ -235,6 +237,7 @@ public class MoveNodeButton extends BaseButton {
             for (MapNode node : this.moveNodes) {
                 checkAreaForNodeOverlap(node);
             }
+            getMapPanel().getRoadMap().refreshTableNodeList(moveNodes);
             getMapPanel().repaint();
             setStale(true);
         }

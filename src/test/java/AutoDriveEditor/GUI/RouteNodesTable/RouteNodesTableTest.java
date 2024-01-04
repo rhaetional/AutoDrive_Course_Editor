@@ -1,4 +1,4 @@
-package AutoDriveEditor.MapPanel.routeNodesTable;
+package AutoDriveEditor.GUI.RouteNodesTable;
 
 import AutoDriveEditor.RoadNetwork.MapNode;
 import org.junit.jupiter.api.AfterEach;

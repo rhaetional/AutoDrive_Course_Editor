@@ -14,6 +14,7 @@ public abstract class CopyPasteBaseButton extends BaseButton {
         suspendAutoSaving();
         if (isMultipleSelected && multiSelectList.size() > 0 ) {
             cnpManager.CutSelection(multiSelectList);
+            getMapPanel().getRoadMap().refreshTableNodeList(multiSelectList);
             getMapPanel().repaint();
 
         } else {
