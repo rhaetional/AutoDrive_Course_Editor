@@ -123,21 +123,31 @@ public class RouteNodesTable implements PropertyChangeListener {
     }
 
     @SuppressWarnings("unchecked")
-    private static LinkedList<MapNode> safeCastToLinkedListMapNode(Object unknownObject) {
+    private static LinkedList<MapNode> safeCastToLinkedListMapNode(Object unknownObject) throws ClassCastException {
+        if (unknownObject == null) {
+            return null;
+        }
+
+        boolean invalidClass = true;
         if (unknownObject instanceof LinkedList) {
+            invalidClass = false;
             LinkedList<?> unknownList = (LinkedList<?>) unknownObject;
             if (!unknownList.isEmpty() && unknownList.get(0) instanceof MapNode) {
                 return (LinkedList<MapNode>) unknownList;
             }
         } else if (unknownObject instanceof ArrayList) {
+            invalidClass = false;
             // with 1.0.7, ArrayLists are used in some contexts
             LinkedList<?> unknownList = new LinkedList<>((ArrayList<?>) unknownObject);
             if (!unknownList.isEmpty() && unknownList.get(0) instanceof MapNode) {
                 return (LinkedList<MapNode>) unknownList;
             }
         }
-        // Object of different type or LL is empty
-        return null;
+        if (invalidClass) {
+            throw new ClassCastException("safeCastToLinkedListMapNode cannot cast " + unknownObject.getClass());
+        }
+        // return empty list
+        return new LinkedList<MapNode>();
     }
 
 
