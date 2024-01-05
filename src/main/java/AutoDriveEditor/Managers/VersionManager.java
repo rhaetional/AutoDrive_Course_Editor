@@ -101,12 +101,12 @@ public class VersionManager {
 
                     Object[] inputFields = new Object[]{"<html><b>A new version of AutoDrive Editor is available!</b><br><br>",
                             "<html>GitHub Version <b>v" + remoteVersion + "</b> -- you are running v" + COURSE_EDITOR_VERSION + "<br><br>",
-                            "<html><b>Release Notes</b>", scrollPane, " "};
+                            "<html><b>Release Notes</b>",scrollPane, " "};
 
                     JOptionPane.showMessageDialog(editor, inputFields, "Version Update", JOptionPane.INFORMATION_MESSAGE, getUpdateIcon());
                 }
                 bShowUpdateMessage = false;
-            } else if (localSem.isEqualTo(remoteVersion)) {
+            } else if (localSem.isEqualTo(remoteVersion)){
                 LOG.info("No update available... Remote version {} matches local version", remoteVersion);
                 bShowUpdateMessage = true;
             } else {
@@ -144,7 +144,7 @@ public class VersionManager {
                 URL url = new URL(gitRepository + "history.xml");
                 HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
                 HttpURLConnection.setFollowRedirects(true);
-                urlConnection.setConnectTimeout(5 * 1000);
+                urlConnection.setConnectTimeout(5*1000);
                 urlConnection.setRequestMethod("GET");
                 urlConnection.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows; U; Windows NT 6.0; en-US; rv:1.9.1.2) Gecko/20090729 Firefox/3.5.2 (.NET CLR 3.5.30729)");
                 urlConnection.connect();
@@ -171,8 +171,8 @@ public class VersionManager {
             textPane.setText(updateHTML);
             textPane.setEditable(false);
             textPane.addHyperlinkListener(e1 -> {
-                if (e1.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
-                    if (Desktop.isDesktopSupported()) {
+                if(e1.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
+                    if(Desktop.isDesktopSupported()) {
                         try {
                             Desktop.getDesktop().browse(e1.getURL().toURI());
                         } catch (IOException | URISyntaxException ex) {
@@ -186,7 +186,7 @@ public class VersionManager {
             scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
             scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
             scrollPane.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
-            scrollPane.setPreferredSize(new Dimension(700, 600));
+            scrollPane.setPreferredSize(new Dimension(700,600));
 
             // ScrollPane will default to the bottom of the text.
             //

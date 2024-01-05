@@ -130,6 +130,7 @@ public class AutoDriveEditor extends JFrame {
 
 
         // Init menu bar
+
         setJMenuBar(new EditorMenu());
 
         add(mapPanel, BorderLayout.CENTER);

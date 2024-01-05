@@ -9,7 +9,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.Arrays;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.fail;
 
 class RouteNodesTableViewTest {
@@ -24,9 +24,10 @@ class RouteNodesTableViewTest {
         nodesTableView = new RouteNodesTableView(nodesTableController, nodesTableModel);
 
         for (int i = 0; i < 13; i++) {
-            MapNode mapNode = new MapNode(i + 1, 47.39939 - i, 8.44171 + i, 391.2 - i % 2 * 10 * i + (1 - i % 2) * 10 * i, 0, false, false);
+            int markerId = i + 1;
+            MapNode mapNode = new MapNode(markerId, 47.39939 - i, 8.44171 + i, 391.2 - i % 2 * 10 * i + (1 - i % 2) * 10 * i, 0, false, false);
             if (i % 2 == 1)
-                mapNode.createMapMarker("Test Marker " + i, "Test Group " + i, Arrays.asList(20+i, 30-i, 33+i));
+                mapNode.createMapMarker("Test Marker " + i, "Test Group " + i,markerId, Arrays.asList(20+i, 30-i, 33+i));
 
             nodesTableModel.addNode(mapNode);
         }
@@ -35,7 +36,7 @@ class RouteNodesTableViewTest {
     @Test
     void clearTableFilter() {
         nodesTableView.clearTableFilter();
-        assertEquals(null, nodesTableView.getTable().getRowSorter());
+        assertNull(nodesTableView.getTable().getRowSorter());
     }
 
     @Disabled("Can't see the change from here. Leave for now, as minor function")

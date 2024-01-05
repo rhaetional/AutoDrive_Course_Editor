@@ -2,12 +2,14 @@ package AutoDriveEditor.RoadNetwork;
 
 import AutoDriveEditor.Utils.ExceptionUtils;
 
+import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.math.RoundingMode;
 import java.util.LinkedList;
 import java.util.ListIterator;
 import java.util.UUID;
 
+import static AutoDriveEditor.AutoDriveEditor.getMapPanel;
 import static AutoDriveEditor.GUI.MapPanel.getYValueFromHeightMap;
 import static AutoDriveEditor.GUI.MapPanel.roadMap;
 import static AutoDriveEditor.GUI.Menus.DebugMenu.Logging.LogUndoRedoMenu.bDebugLogUndoRedo;
@@ -84,21 +86,8 @@ public class RoadMap {
     public static MapNode createControlNode(double x, double z) {
         return new MapNode(-99, x, 0, z, NODE_FLAG_REGULAR, false, true);
     }
-/*    public static void addMapNode(MapNode newNode) {
-        networkNodesList.add(newNode);
-        pcs.firePropertyChange("networkNodesList.add", null,newNode);
-    }
 
-    public static void addAll(LinkedList<MapNode> nodes) {
-        networkNodesList.addAll(nodes);
-        pcs.firePropertyChange("networkNodesList.addAll", null, nodes);
-    }
-
-    public static void removeAll(LinkedList<MapNode> nodes) {
-        networkNodesList.removeAll(nodes);
-        pcs.firePropertyChange("networkNodesList.removeAll", nodes, null);
-    }*/
-    public void insertMapNode(MapNode toAdd, LinkedList<MapNode> otherNodesInList, LinkedList<MapNode> otherNodesOutList) {
+    public void insertMapNode(MapNode toAdd, LinkedList<MapNode> otherNodesInList, LinkedList<MapNode> otherNodesOutList) throws ExceptionUtils.MismatchedIdException {
 
         // starting at the index of where we need to insert the node
         // increment the ID's of all nodes to the right of the mapNodes by +1

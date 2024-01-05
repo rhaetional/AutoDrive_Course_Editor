@@ -34,6 +34,7 @@ import static AutoDriveEditor.GUI.MapPanel.*;
 import static AutoDriveEditor.GUI.Menus.DebugMenu.Logging.LogRouteManagerMenu.bDebugLogRouteManager;
 import static AutoDriveEditor.GUI.Menus.EditorMenu.*;
 import static AutoDriveEditor.GUI.Menus.FileMenu.RecentFilesMenu.addToRecentFiles;
+import static AutoDriveEditor.GUI.RouteNodesTable.RouteNodesTable.getRouteNodesTable;
 import static AutoDriveEditor.Locale.LocaleManager.getLocaleString;
 import static AutoDriveEditor.Managers.ImportManager.setEditorUsingImportedImage;
 import static AutoDriveEditor.Managers.MultiSelectManager.clearMultiSelection;

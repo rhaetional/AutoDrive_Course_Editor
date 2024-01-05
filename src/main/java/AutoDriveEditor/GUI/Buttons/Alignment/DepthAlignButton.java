@@ -6,9 +6,9 @@ import AutoDriveEditor.RoadNetwork.MapNode;
 import javax.swing.*;
 
 import static AutoDriveEditor.AutoDriveEditor.changeManager;
+import static AutoDriveEditor.AutoDriveEditor.getMapPanel;
 import static AutoDriveEditor.Locale.LocaleManager.getLocaleString;
 import static AutoDriveEditor.Managers.MultiSelectManager.multiSelectList;
-import static AutoDriveEditor.MapPanel.MapPanel.getMapPanel;
 import static AutoDriveEditor.Utils.GUIUtils.makeImageToggleButton;
 import static AutoDriveEditor.Utils.LoggerUtils.LOG;
 

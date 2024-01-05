@@ -5,7 +5,9 @@ import AutoDriveEditor.RoadNetwork.MapNode;
 
 import java.util.LinkedList;
 
-import static AutoDriveEditor.MapPanel.MapPanel.*;
+import static AutoDriveEditor.AutoDriveEditor.getMapPanel;
+import static AutoDriveEditor.GUI.MapPanel.isStale;
+import static AutoDriveEditor.GUI.MapPanel.setStale;
 
 /**
  * Coordinate changer is a generic class to incrementally store arbitrary changes to the coordinates of

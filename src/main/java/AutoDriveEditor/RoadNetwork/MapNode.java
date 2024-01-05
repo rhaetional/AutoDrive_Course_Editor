@@ -76,19 +76,23 @@ public class MapNode  implements Comparable<MapNode> {
         if (bDebugLogMarkerInfo) LOG.info("Creating Map Marker for Node ID {} ( Name = {}, Group = {} )", this.id, newName, newGroup);
         this.mapMarker = new MapMarker(newName, newGroup, null, null);
     }
-    //TODO: Remove as unused?
-    public void createMapMarker(String newName, String newGroup, List<Integer> newParkedVehiclesList) {
+
+    // EXPERIMENTAL CODE
+    public void createMapMarker(String newName, String newGroup, int id, List<Integer> newParkedVehiclesList) {
         if (bDebugLogMarkerInfo) LOG.info("Creating Map Marker for Node ID {} ( Name = {}, Group = {}, ParkingDestinationVehicleID = {} )", this.id, newName, newGroup, newParkedVehiclesList);
-        this.mapMarker = new MapMarker(newName, newGroup, null, newParkedVehiclesList);
+        this.mapMarker = new MapMarker(newName, newGroup, id, newParkedVehiclesList);
     }
+    // END EXPERIMENTAL CODE
 
     public void removeMapMarker() {
         if (bDebugLogMarkerInfo) LOG.info("Removing Map Marker from Node ID {}", this.id);
         this.mapMarker = null;
     }
 
+    // EXPERIMENTAL CODE
     public boolean isParkDestination() {return ( this.mapMarker != null && this.mapMarker.parkedVehiclesList !=null ); }
     public int getParkingID() { return this.mapMarker.mapMarkerID; }
+    // END EXPERIMENTAL CODE
 
     public void clearWarningNodes() {
         this.warningNodes.clear();
@@ -149,7 +153,6 @@ public class MapNode  implements Comparable<MapNode> {
     public void setMarkerName(String markerName) {
         this.mapMarker.name = markerName;
     }
-
     public void setMarkerGroup(String markerGroup) {
         this.mapMarker.group = markerGroup;
     }
@@ -267,14 +270,18 @@ public class MapNode  implements Comparable<MapNode> {
     private static class MapMarker {
         public String name;
         public String group;
+        // EXPERIMENTAL CODE
         public Integer mapMarkerID;
         public List<Integer> parkedVehiclesList;
+        // END EXPERIMENTAL CODE
 
         public MapMarker (String name, String group, Integer mapMarkerID, List<Integer> parkedVehiclesList) {
             this.name = name;
             this.group = group;
+            // EXPERIMENTAL CODE
             this.mapMarkerID = mapMarkerID;
             this.parkedVehiclesList = parkedVehiclesList;
+            // END EXPERIMENTAL CODE
         }
     }
 }

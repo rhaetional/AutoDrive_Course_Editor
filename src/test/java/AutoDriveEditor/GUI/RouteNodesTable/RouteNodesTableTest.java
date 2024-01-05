@@ -22,13 +22,14 @@ class RouteNodesTableTest {
     void setUp() {
         nodesTableModel = new RouteNodesTableModel();
         nodesTableView = new RouteNodesTableView(nodesTableController, nodesTableModel);
-        nodesTableController = new RouteNodesTable(nodesTableModel,nodesTableView);
+        nodesTableController = new RouteNodesTable(nodesTableModel, nodesTableView);
 
         testRoadMap = new LinkedList<>();
         for (int i = 0; i < testRoadMapSize; i++) {
-            MapNode mapNode = new MapNode(i + 1, 47.39939 - i, 8.44171 + i, 391.2 - i % 2 * 10 * i + (1 - i % 2) * 10 * i, 0, false, false);
+            int markerId = i + 1;
+            MapNode mapNode = new MapNode(markerId, 47.39939 - i, 8.44171 + i, 391.2 - i % 2 * 10 * i + (1 - i % 2) * 10 * i, 0, false, false);
             if (i % 2 == 1)
-                mapNode.createMapMarker("Test Marker " + i, "Test Group " + i, Arrays.asList(20+i, 30-i, 33+i));
+                mapNode.createMapMarker("Test Marker " + i, "Test Group " + i, markerId, Arrays.asList(20 + i, 30 - i, 33 + i));
 
             testRoadMap.add(mapNode);
         }

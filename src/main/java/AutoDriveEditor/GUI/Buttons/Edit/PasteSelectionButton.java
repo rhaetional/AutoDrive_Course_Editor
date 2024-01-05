@@ -60,13 +60,13 @@ public class PasteSelectionButton extends CopyPasteBaseButton {
 
         public void undo(){
             clearMultiSelection();
-            RoadMap.removeAll(this.storeNodes);
+            RoadMap.networkNodesList.removeAll(this.storeNodes);
             getMapPanel().repaint();
             setStale(this.isStale);
         }
 
         public void redo(){
-            RoadMap.addAll(this.storeNodes);
+            RoadMap.networkNodesList.addAll(this.storeNodes);
             getMapPanel().repaint();
             setStale(true);
         }

@@ -1,14 +1,15 @@
 package AutoDriveEditor.GUI.RouteNodesTable;
-// Packages to import
 
-import AutoDriveEditor.GUI.MapPanel;
+// Packages to import
 import AutoDriveEditor.RoadNetwork.MapNode;
 
 import javax.swing.*;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.ArrayList;
 import java.util.LinkedList;
 
+import static AutoDriveEditor.AutoDriveEditor.getMapPanel;
 import static AutoDriveEditor.AutoDriveEditor.routeNodesTable;
 import static AutoDriveEditor.Utils.LoggerUtils.LOG;
 
@@ -128,6 +129,12 @@ public class RouteNodesTable implements PropertyChangeListener {
             if (!unknownList.isEmpty() && unknownList.get(0) instanceof MapNode) {
                 return (LinkedList<MapNode>) unknownList;
             }
+        } else if (unknownObject instanceof ArrayList) {
+            // with 1.0.7, ArrayLists are used in some contexts
+            LinkedList<?> unknownList = new LinkedList<>((ArrayList<?>) unknownObject);
+            if (!unknownList.isEmpty() && unknownList.get(0) instanceof MapNode) {
+                return (LinkedList<MapNode>) unknownList;
+            }
         }
         // Object of different type or LL is empty
         return null;
@@ -135,7 +142,7 @@ public class RouteNodesTable implements PropertyChangeListener {
 
 
     public void centreNodeInMapPanel(MapNode mapNode) {
-        SwingUtilities.invokeLater(() -> MapPanel.centreNodeInMapPanel(mapNode));
+        SwingUtilities.invokeLater(() -> getMapPanel().centreNodeInMapPanel(mapNode));
     }
 
     public JPanel getView() {
