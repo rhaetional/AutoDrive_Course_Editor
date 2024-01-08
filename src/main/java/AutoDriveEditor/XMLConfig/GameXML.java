@@ -36,6 +36,7 @@ import static AutoDriveEditor.GUI.Menus.DebugMenu.Logging.LogConfigMenu.bDebugLo
 import static AutoDriveEditor.GUI.Menus.EditorMenu.*;
 import static AutoDriveEditor.GUI.Menus.FileMenu.RecentFilesMenu.addToRecentFiles;
 import static AutoDriveEditor.GUI.Menus.RoutesMenu.OpenRoutesConfig.menu_OpenRoutesConfig;
+import static AutoDriveEditor.GUI.RouteNodesTable.RouteNodesTable.getRouteNodesTable;
 import static AutoDriveEditor.Locale.LocaleManager.getLocaleString;
 import static AutoDriveEditor.Managers.ImportManager.setEditorUsingImportedImage;
 import static AutoDriveEditor.Managers.MultiSelectManager.clearMultiSelection;
@@ -407,6 +408,7 @@ public class GameXML {
             LOG.info("---------------------------------");
 
             RoadMap roadMap = new RoadMap();
+            roadMap.addPropertyChangeListener(getRouteNodesTable());
             setRoadMapNodes(roadMap, new LinkedList<>(nodes));
 
             // check for MapName element

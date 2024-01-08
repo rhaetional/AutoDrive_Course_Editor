@@ -109,7 +109,7 @@ public class MapNode  implements Comparable<MapNode> {
     }
     public boolean hasWarning() { return this.hasWarning; }
 
-    public boolean hasVehicleParking() { return this.getParkedVehiclesList().size() > 0; }
+    public boolean hasVehicleParking() { return !this.getParkedVehiclesList().isEmpty(); }
     @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     public boolean isScheduledToBeDeleted() { return this.scheduledToBeDeleted; }
     public boolean isControlNode() { return this.isControlNode; }

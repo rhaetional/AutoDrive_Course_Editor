@@ -87,6 +87,21 @@ public class RoadMap {
         return new MapNode(-99, x, 0, z, NODE_FLAG_REGULAR, false, true);
     }
 
+    public static void addMapNode(MapNode newNode) {
+        networkNodesList.add(newNode);
+        pcs.firePropertyChange("networkNodesList.add", null,newNode);
+    }
+
+    public static void addAll(LinkedList<MapNode> nodes) {
+        networkNodesList.addAll(nodes);
+        pcs.firePropertyChange("networkNodesList.addAll", null, nodes);
+    }
+
+    public static void removeAll(LinkedList<MapNode> nodes) {
+        networkNodesList.removeAll(nodes);
+        pcs.firePropertyChange("networkNodesList.removeAll", nodes, null);
+    }
+
     public void insertMapNode(MapNode toAdd, LinkedList<MapNode> otherNodesInList, LinkedList<MapNode> otherNodesOutList) throws ExceptionUtils.MismatchedIdException {
 
         // starting at the index of where we need to insert the node
@@ -144,7 +159,6 @@ public class RoadMap {
             mapNode.getHiddenConnectionsList().clear();
             if (mapNode.id > toDelete.id) {
                 mapNode.id--;
-                //TODO: Merge check if needed
                 getMapPanel().getRoadMap().refreshTableNode(mapNode);
             }
         }

@@ -41,7 +41,6 @@ public class RouteNodesTable implements PropertyChangeListener {
      * Loads LinkedList of MapNodes to the model
      * @param roadList MapNodes to be added to model
      */
-    //TODO: Remove LinkedList class
     public void loadRoadMap(LinkedList<MapNode> roadList) {
         if (roadList != null) {
             // Data to be displayed in the JTable
@@ -147,7 +146,7 @@ public class RouteNodesTable implements PropertyChangeListener {
             throw new ClassCastException("safeCastToLinkedListMapNode cannot cast " + unknownObject.getClass());
         }
         // return empty list
-        return new LinkedList<MapNode>();
+        return new LinkedList<>();
     }
 
 
