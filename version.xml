@@ -1,11 +1,14 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <AutoDriveEditor>
-    <latest_version>1.0.7</latest_version>
+    <latest_version>1.0.7-rhae.0</latest_version>
     <version_notes><![CDATA[<html>
         <head>
             <title>Version Notes</title>
         </head>
         <body>
+        <!-- Rhaetional override --!>
+            <p><i>Download current <a href="https://github.com/rhaetional/AutoDrive_Course_Editor/releases/latest/download/AutoDriveEditor.zip">rhae-fork release here</a>.</i></p>
+        <!-- Rhaetional override --!>
             <h3 style="font-family:verdana;">Update to v1.0.7</h2>
             <p><u>Added</u></p>
             <ul>
