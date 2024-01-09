@@ -127,6 +127,7 @@ public class AutoDriveEditor extends JFrame {
 
         mapPanel = new MapPanel();
         routeNodesTable = new RouteNodesTable();
+        routeNodesTable.getModel().addTableModelListener(mapPanel);
 
 
         // Init menu bar

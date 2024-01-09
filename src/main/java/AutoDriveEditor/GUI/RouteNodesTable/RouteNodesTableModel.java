@@ -131,6 +131,18 @@ import java.util.stream.Collectors;
     public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
         MapNode node = data.get(rowIndex);
         switch (columnIndex) {
+            case 0:
+                node.id = (int) aValue;
+                break;
+            case 1:
+                node.x = (double) aValue;
+                break;
+            case 2:
+                node.y = (double) aValue;
+                break;
+            case 3:
+                node.z = (double) aValue;
+                break;
             case 4:
                 node.setMarkerName((String) aValue);
                 break;
@@ -141,6 +153,8 @@ import java.util.stream.Collectors;
                 node.setParkedVehiclesList(safeCastToLinkedListInteger(aValue));
                 break;
         }
+
+        fireTableRowsUpdated(rowIndex, rowIndex);
     }
 
     @SuppressWarnings("unchecked")
@@ -174,9 +188,6 @@ import java.util.stream.Collectors;
 
     public boolean isCellEditable(int rowIndex, int columnIndex) {
         // columns 0 and 6 are read-only
-        // return (columnIndex != 0) && (columnIndex != 6);
-
-        // disable editing until changes are updated to the model.
-        return false;
+        return (columnIndex != 0) && (columnIndex != 6);
     }
 }

@@ -1,6 +1,7 @@
 package AutoDriveEditor.GUI.RouteNodesTable;
 
 // Packages to import
+
 import AutoDriveEditor.RoadNetwork.MapNode;
 
 import javax.swing.*;
@@ -156,5 +157,9 @@ public class RouteNodesTable implements PropertyChangeListener {
 
     public JPanel getView() {
         return nodesTableView;
+    }
+
+    public RouteNodesTableModel getModel() {
+        return nodesTableModel;
     }
 }

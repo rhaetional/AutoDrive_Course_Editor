@@ -12,6 +12,8 @@ import AutoDriveEditor.Utils.GUIUtils;
 import AutoDriveEditor.Utils.ProfileUtil;
 
 import javax.swing.*;
+import javax.swing.event.TableModelEvent;
+import javax.swing.event.TableModelListener;
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.geom.Point2D;
@@ -64,7 +66,7 @@ import static AutoDriveEditor.XMLConfig.EditorXML.*;
 import static AutoDriveEditor.XMLConfig.GameXML.saveGameConfig;
 import static AutoDriveEditor.XMLConfig.RoutesXML.saveRouteManagerXML;
 
-public class MapPanel extends JPanel {
+public class MapPanel extends JPanel implements TableModelListener {
 
     public static final int CONFIG_SAVEGAME = 1;
     public static final int CONFIG_ROUTEMANAGER = 2;
@@ -1162,6 +1164,23 @@ public class MapPanel extends JPanel {
             this.transparency = transparency;
         }
     }
+
+    /**
+     * This fine grain notification tells listeners the exact range
+     * of cells, rows, or columns that changed.
+     *
+     * @param e a {@code TableModelEvent} to notify listener that a table model
+     *          has changed
+     *
+     */
+    @Override
+    public void tableChanged(TableModelEvent e) {
+        if (e.getType() == TableModelEvent.UPDATE) {
+            // Update the panel's visual representation based on the changed row
+            this.repaint();
+        }
+    }
+
 
     //
     // Testing only
