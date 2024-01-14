@@ -2,7 +2,7 @@
 
 I forked the original [AutoDrive Course Editor](https://github.com/KillBait/AutoDrive_Course_Editor) to address specific needs for my use of the original tool. 
 
-This fork is intended for my personal use, but I'm sharing it here for anyone who has similar needs, or wants to apply particular fixes (e.g. out of bounds nodes, or node elevation). While I'm careful and bug-averse, the testing is limited to my use cases and [FS22 AutoDrive](https://github.com/Stephan-S/FS22_AutoDrive). Treat this as beta software and be sure to create backups of the configurations files (if you're editing a savegame this would be `AutoDrive_config.xml` and `vehicles.xml`).
+This fork is intended for my personal use, but I'm sharing it here for anyone who has similar needs, or wants to apply particular fixes (e.g. out of bounds nodes, or node elevation). Be sure to create backups of the configurations files (if you're editing a savegame this would be `AutoDrive_config.xml` and `vehicles.xml`).
 
 **Upstream version:** 1.0.7 by KillBait
 
