@@ -1,6 +1,7 @@
 package AutoDriveEditor.GUI.RouteNodesTable;
 
 // Packages to import
+
 import AutoDriveEditor.RoadNetwork.MapNode;
 
 import javax.swing.*;
@@ -72,7 +73,8 @@ public class RouteNodesTable implements PropertyChangeListener {
     }
 
     /**
-     * This method gets called when a bound property is changed.
+     * This method gets called when a bound property is changed. It is used to notify / update the table model when the
+     * road map is modified in the MapPanel or a new file was loaded, for example.
      *
      * @param evt A PropertyChangeEvent object describing the event source
      *            and the property that has changed.
@@ -156,5 +158,9 @@ public class RouteNodesTable implements PropertyChangeListener {
 
     public JPanel getView() {
         return nodesTableView;
+    }
+
+    public RouteNodesTableModel getModel() {
+        return nodesTableModel;
     }
 }

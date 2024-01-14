@@ -12,32 +12,16 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.util.ArrayList;
 import java.util.Enumeration;
+import java.util.List;
 
 public class RouteNodesTableView extends JPanel implements TableModelListener {
-    public enum NodeFilterType {
-        FILTER_CLEAR(-1, "NULL"),
-        FILTER_ALL(0, "Show All"),
-        FILTER_MARKERS(1, "Show Markers"),
-        FILTER_PARKING(2, "Show Parking");
-        final String filterName;
-        final int filterId;
-        NodeFilterType(int filterId, String filterName) {
-            this.filterId = filterId;
-            this.filterName = filterName;
-        }
-        public String getFilterName() {
-            return filterName;
-        }
-        public int getFilterId() {
-            return filterId;
-        }
-    }
-
     private final NodeFilterType defaultFilter = NodeFilterType.FILTER_MARKERS;
     private final RouteNodesTableModel nodesTableModel;
     private final RouteNodesTable nodesTableController;
     private final JTable nodesTable;
+    private final List<MarkerGroupCell> listMarkerGroupCell;
     private final TableColumnAdjuster tableColumnAdjuster;
     private final FilterButtonPanel filterButtonPanel;
 
@@ -47,12 +31,15 @@ public class RouteNodesTableView extends JPanel implements TableModelListener {
         this.nodesTableModel.addTableModelListener(this);
 
         nodesTable = new JTable(nodesTableModel);
+        listMarkerGroupCell = new ArrayList<>();
+        nodesTable.setDefaultRenderer(MarkerGroupCell.class, new MarkerGroupCellRenderer(listMarkerGroupCell));
+        nodesTable.setDefaultEditor(MarkerGroupCell.class, new MarkerGroupCellEditor(listMarkerGroupCell));
+
         tableColumnAdjuster = new TableColumnAdjuster(nodesTable);
 //        this.nodesTableModel.addTableModelListener(tableColumnAdjuster);
         filterButtonPanel = new FilterButtonPanel();
         initializeUI();
     }
-
 
     /**
      * clearTableFilter() and setTableFilter() are used to get around issues caused by the filters
@@ -111,6 +98,7 @@ public class RouteNodesTableView extends JPanel implements TableModelListener {
     public void resizeTableColumns() {
         tableColumnAdjuster.adjustColumns();
     }
+
     private void setTableFilter() {
         switch (filterButtonPanel.activeFilter) {
             case FILTER_CLEAR:
@@ -209,13 +197,32 @@ public class RouteNodesTableView extends JPanel implements TableModelListener {
         return nodesTable;
     }
 
+    public enum NodeFilterType {
+        FILTER_CLEAR(-1, "NULL"),
+        FILTER_ALL(0, "Show All"),
+        FILTER_MARKERS(1, "Show Markers"),
+        FILTER_PARKING(2, "Show Parking");
+        final String filterName;
+        final int filterId;
+        NodeFilterType(int filterId, String filterName) {
+            this.filterId = filterId;
+            this.filterName = filterName;
+        }
+        public String getFilterName() {
+            return filterName;
+        }
+        public int getFilterId() {
+            return filterId;
+        }
+    }
+
     /**
      * Class to encapsulate the FilterPanel and its "Filter States"
      */
     private class FilterButtonPanel extends JPanel {
 
-        protected NodeFilterType activeFilter = NodeFilterType.FILTER_CLEAR;
         private final ButtonGroup filterButtonGroup;
+        protected NodeFilterType activeFilter = NodeFilterType.FILTER_CLEAR;
 
 
         public FilterButtonPanel() {
@@ -287,12 +294,12 @@ public class RouteNodesTableView extends JPanel implements TableModelListener {
         private class FilterButtonListener implements ActionListener {
             private NodeFilterType filterType = NodeFilterType.FILTER_CLEAR;
 
-            public void setFilterType(NodeFilterType newFilterType) {
-                filterType = newFilterType;
-            }
-
             public NodeFilterType getFilterType() {
                 return filterType;
+            }
+
+            public void setFilterType(NodeFilterType newFilterType) {
+                filterType = newFilterType;
             }
 
             public void actionPerformed(ActionEvent e) {

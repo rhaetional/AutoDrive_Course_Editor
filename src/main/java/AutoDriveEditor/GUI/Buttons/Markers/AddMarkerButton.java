@@ -133,7 +133,7 @@ public class AddMarkerButton extends MarkerBaseButton {
     }
 
     @SuppressWarnings("EqualsBetweenInconvertibleTypes")
-    public void createMarkerForNode(MapNode mapNode, String newMarkerName, String newMarkerGroup) {
+    public static void createMarkerForNode(MapNode mapNode, String newMarkerName, String newMarkerGroup) {
         if (mapNode != null && newMarkerName != null && newMarkerName.length() > 0) {
             if (newMarkerGroup == null) newMarkerGroup = "All";
             //MapMarker mapMarker = new MapMarker(newMarkerName, newMarkerGroup);

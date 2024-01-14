@@ -23,6 +23,11 @@ public class CoordinateChanger  implements ChangeManager.Changeable {
         this.nodeList = new LinkedList<>();
     }
 
+    public CoordinateChanger(MapNode node, double newX, double newY, double newZ) {
+        this();
+        addCoordinateChange(node, newX, newY, newZ);
+    }
+
     public void addCoordinateChange(MapNode node, double newX, double newY, double newZ) {
         this.nodeList.add(new Coordinates(node, newX, newY, newZ));
     }

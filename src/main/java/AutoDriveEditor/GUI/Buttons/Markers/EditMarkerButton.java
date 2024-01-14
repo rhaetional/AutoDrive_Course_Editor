@@ -52,28 +52,38 @@ public class EditMarkerButton extends MarkerBaseButton {
                 if (selectedNode.hasMapMarker()) {
                     markerDestinationInfo info = showEditMarkerDialog(selectedNode);
                     if (info != null && info.getName() != null) {
-                        if (bDebugLogMarkerInfo) LOG.info("{} {} - Name = {} --> {} , Group = {} --> {}", getLocaleString("console_marker_modify"), selectedNode.id, selectedNode.getMarkerName(), info.getName(), selectedNode.getMarkerGroup(), info.getGroup());
-                        changeManager.addChangeable(new MarkerEditChanger(selectedNode, info.getName(), info.getGroup()));
-                        if (configType == CONFIG_ROUTEMANAGER) {
-                            boolean found = false;
-                            for (MarkerGroup marker : markerGroup) {
-                                if (Objects.equals(marker.groupName, info.getGroup())) {
-                                    found = true;
-                                    break;
-                                }
-                            }
-                            if (!found && !info.getGroup().equals("All")) {
-                                LOG.info("Adding new group {} to markerGroup", info.getGroup());
-                                markerGroup.add(new MarkerGroup(markerGroup.size() + 1, info.getGroup()));
-                            }
-                        }
-                        selectedNode.setMarkerName(info.getName());
-                        selectedNode.setMarkerGroup(info.getGroup());
-                        setStale(true);
+                        editMarker(selectedNode, info.getName(), info.getGroup());
                     }
                 }
             }
         }
+    }
+
+    /*
+    RHAE11 - extracted as function, so that it can be used by table model.
+     */
+    public static void editMarker(MapNode selectedNode, String newMarkerName, String newMarkerGroup) {
+        if (bDebugLogMarkerInfo) LOG.info("{} {} - Name = {} --> {} , Group = {} --> {}", getLocaleString("console_marker_modify"), selectedNode.id, selectedNode.getMarkerName(), newMarkerName, selectedNode.getMarkerGroup(), markerGroup);
+
+        changeManager.addChangeable(new MarkerEditChanger(selectedNode, newMarkerName, newMarkerGroup));
+
+        if (configType == CONFIG_ROUTEMANAGER) {
+            boolean found = false;
+            for (MarkerGroup marker : markerGroup) {
+                if (Objects.equals(marker.groupName, newMarkerGroup)) {
+                    found = true;
+                    break;
+                }
+            }
+            if (!found && !newMarkerGroup.equals("All")) {
+                LOG.info("Adding new group {} to markerGroup", newMarkerGroup);
+                markerGroup.add(new MarkerGroup(markerGroup.size() + 1, newMarkerGroup));
+            }
+        }
+
+        selectedNode.setMarkerName(newMarkerName);
+        selectedNode.setMarkerGroup(newMarkerGroup);
+        setStale(true);
     }
 
     //
