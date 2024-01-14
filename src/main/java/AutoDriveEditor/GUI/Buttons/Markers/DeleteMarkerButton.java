@@ -45,7 +45,7 @@ public class DeleteMarkerButton extends MarkerBaseButton {
         }
     }
 
-    public void removeMarkerFromNode(MapNode fromMapNode) {
+    public static void removeMarkerFromNode(MapNode fromMapNode) {
         suspendAutoSaving();
         changeManager.addChangeable( new MarkerRemoveChanger(fromMapNode));
         fromMapNode.removeMapMarker();

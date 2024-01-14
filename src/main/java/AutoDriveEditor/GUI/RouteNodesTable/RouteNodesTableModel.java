@@ -12,6 +12,8 @@ import java.util.stream.Collectors;
 
 import static AutoDriveEditor.AutoDriveEditor.changeManager;
 import static AutoDriveEditor.AutoDriveEditor.getMapPanel;
+import static AutoDriveEditor.GUI.Buttons.Markers.AddMarkerButton.createMarkerForNode;
+import static AutoDriveEditor.GUI.Buttons.Markers.DeleteMarkerButton.removeMarkerFromNode;
 import static AutoDriveEditor.GUI.Buttons.Markers.EditMarkerButton.editMarker;
 import static AutoDriveEditor.GUI.MapPanel.setStale;
 import static AutoDriveEditor.XMLConfig.AutoSave.resumeAutoSaving;
@@ -181,13 +183,11 @@ public class RouteNodesTableModel extends AbstractTableModel {
                 break;
             case 4:
                 String newMarkerName = (String) aValue;
-                editMarker(node, newMarkerName, node.getMarkerGroup()); // reuse logic from EditMarkerButton
-                node.setMarkerName(newMarkerName);
+                setMarkerValue(node, newMarkerName, null);
                 break;
             case 5:
                 String newMarkerGroup = ((MarkerGroupCell) aValue).getName();
-                editMarker(node, node.getMarkerName(), newMarkerGroup); // reuse logic from EditMarkerButton
-                node.setMarkerGroup(newMarkerGroup);
+                setMarkerValue(node, null, newMarkerGroup);
                 break;
             case 6:
                 // currently not editable
@@ -201,6 +201,31 @@ public class RouteNodesTableModel extends AbstractTableModel {
         setStale(true);
         getMapPanel().repaint();
         resumeAutoSaving();
+    }
+
+    /*
+        Update or create marker for node. Delete if either name or group are updated to blank / empty string
+     */
+    private void setMarkerValue(MapNode selectedNode, String newMarkerName, String newMarkerGroup) {
+        if (selectedNode.hasMapMarker()) {
+
+            if ((newMarkerName != null && newMarkerName.isBlank()) ||
+                    (newMarkerGroup != null && newMarkerGroup.isBlank())) {
+                removeMarkerFromNode(selectedNode);  // reuse logic from DeleteMarkerButton
+            } else {
+                // assign unchanged value
+                if (newMarkerName == null) newMarkerName = selectedNode.getMarkerName();
+                if (newMarkerGroup == null) newMarkerGroup = selectedNode.getMarkerGroup();
+                editMarker(selectedNode, newMarkerName, newMarkerGroup); // reuse logic from EditMarkerButton
+            }
+        } else {
+            if (newMarkerName == null ) newMarkerName = "New Marker " + selectedNode.id;
+            if (newMarkerGroup == null ) newMarkerGroup = "All";
+            if (!newMarkerName.isBlank() && !newMarkerGroup.isBlank()) {
+                createMarkerForNode(selectedNode, newMarkerName, newMarkerGroup); // reuse logic from AddMarkerButton
+            }
+        }
+
     }
 
     public Class<?> getColumnClass(int columnIndex) {
