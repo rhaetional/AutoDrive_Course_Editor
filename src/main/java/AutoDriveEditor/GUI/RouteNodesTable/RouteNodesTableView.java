@@ -21,7 +21,7 @@ public class RouteNodesTableView extends JPanel implements TableModelListener {
     private final RouteNodesTableModel nodesTableModel;
     private final RouteNodesTable nodesTableController;
     private final JTable nodesTable;
-    private final List<MarkerGroup> listMarkerGroup;
+    private final List<MarkerGroupCell> listMarkerGroupCell;
     private final TableColumnAdjuster tableColumnAdjuster;
     private final FilterButtonPanel filterButtonPanel;
 
@@ -31,9 +31,9 @@ public class RouteNodesTableView extends JPanel implements TableModelListener {
         this.nodesTableModel.addTableModelListener(this);
 
         nodesTable = new JTable(nodesTableModel);
-        listMarkerGroup = new ArrayList<>();
-        nodesTable.setDefaultRenderer(MarkerGroup.class, new MarkerGroupCellRenderer(listMarkerGroup));
-        nodesTable.setDefaultEditor(MarkerGroup.class, new MarkerGroupCellEditor(listMarkerGroup));
+        listMarkerGroupCell = new ArrayList<>();
+        nodesTable.setDefaultRenderer(MarkerGroupCell.class, new MarkerGroupCellRenderer(listMarkerGroupCell));
+        nodesTable.setDefaultEditor(MarkerGroupCell.class, new MarkerGroupCellEditor(listMarkerGroupCell));
 
         tableColumnAdjuster = new TableColumnAdjuster(nodesTable);
 //        this.nodesTableModel.addTableModelListener(tableColumnAdjuster);

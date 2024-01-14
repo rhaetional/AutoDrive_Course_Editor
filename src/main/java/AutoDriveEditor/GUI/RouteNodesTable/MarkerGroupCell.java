@@ -14,10 +14,10 @@ import java.util.Optional;
 /*
     Class to hold the marker group name
  */
-public class MarkerGroup implements Comparable<MarkerGroup> {
+public class MarkerGroupCell implements Comparable<MarkerGroupCell> {
     private String name;
 
-    public MarkerGroup(String name) {
+    public MarkerGroupCell(String name) {
         super();
         this.name = name;
     }
@@ -30,7 +30,7 @@ public class MarkerGroup implements Comparable<MarkerGroup> {
         this.name = name;
     }
 
-    public int compareTo(MarkerGroup otherGroup) {
+    public int compareTo(MarkerGroupCell otherGroup) {
         return this.name.compareTo(otherGroup.name);
     }
     public String toString() {
@@ -43,17 +43,17 @@ public class MarkerGroup implements Comparable<MarkerGroup> {
     custom renderer for cells in the MarkerGroup column.
  */
 class MarkerGroupCellRenderer extends DefaultTableCellRenderer {
-    private List<MarkerGroup> listMarkerGroup;
-    public MarkerGroupCellRenderer(List<MarkerGroup> listMarkerGroup) {
-        this.listMarkerGroup = listMarkerGroup;
+    private List<MarkerGroupCell> listMarkerGroupCell;
+    public MarkerGroupCellRenderer(List<MarkerGroupCell> listMarkerGroupCell) {
+        this.listMarkerGroupCell = listMarkerGroupCell;
     }
 
     public Component getTableCellRendererComponent(JTable table, Object value,
                                                    boolean isSelected, boolean hasFocus, int row, int column) {
-        if (value instanceof MarkerGroup) {
-            MarkerGroup markerGroup = (MarkerGroup) value;
-            updateMarkerGroupList(markerGroup);
-            setText(markerGroup.getName());
+        if (value instanceof MarkerGroupCell) {
+            MarkerGroupCell markerGroupCell = (MarkerGroupCell) value;
+            updateMarkerGroupList(markerGroupCell);
+            setText(markerGroupCell.getName());
         }
 
         if (isSelected) {
@@ -74,13 +74,13 @@ class MarkerGroupCellRenderer extends DefaultTableCellRenderer {
 
         return parent;
     }
-    private void updateMarkerGroupList (MarkerGroup markerGroup){
+    private void updateMarkerGroupList (MarkerGroupCell markerGroupCell){
 
-        Optional<MarkerGroup> result = listMarkerGroup.stream().parallel().filter(group -> group.getName().equals(markerGroup.getName())).findFirst();
+        Optional<MarkerGroupCell> result = listMarkerGroupCell.stream().parallel().filter(group -> group.getName().equals(markerGroupCell.getName())).findFirst();
 
         if (result.isEmpty()) {
-            listMarkerGroup.add(markerGroup);
-            Collections.sort(listMarkerGroup);
+            listMarkerGroupCell.add(markerGroupCell);
+            Collections.sort(listMarkerGroupCell);
         }
     }
 }
@@ -92,32 +92,32 @@ class MarkerGroupCellRenderer extends DefaultTableCellRenderer {
 class MarkerGroupCellEditor extends AbstractCellEditor
         implements TableCellEditor, ActionListener {
 
-    private MarkerGroup markerGroup;
-    private List<MarkerGroup> listMarkerGroup;
+    private MarkerGroupCell markerGroupCell;
+    private List<MarkerGroupCell> listMarkerGroupCell;
 
-    public MarkerGroupCellEditor(List<MarkerGroup> listMarkerGroup) {
-        this.listMarkerGroup = listMarkerGroup;
+    public MarkerGroupCellEditor(List<MarkerGroupCell> listMarkerGroupCell) {
+        this.listMarkerGroupCell = listMarkerGroupCell;
     }
 
     @Override
     public Object getCellEditorValue() {
-        return this.markerGroup;
+        return this.markerGroupCell;
     }
 
     @Override
     public Component getTableCellEditorComponent(JTable table, Object value,
                                                  boolean isSelected, int row, int column) {
-        if (value instanceof MarkerGroup) {
-            this.markerGroup = (MarkerGroup) value;
+        if (value instanceof MarkerGroupCell) {
+            this.markerGroupCell = (MarkerGroupCell) value;
         }
 
-        JComboBox<MarkerGroup> comboMarkerGroup = new JComboBox<MarkerGroup>();
+        JComboBox<MarkerGroupCell> comboMarkerGroup = new JComboBox<MarkerGroupCell>();
 
-        for (MarkerGroup aMarkerGroup : listMarkerGroup) {
-            comboMarkerGroup.addItem(aMarkerGroup);
+        for (MarkerGroupCell aMarkerGroupCell : listMarkerGroupCell) {
+            comboMarkerGroup.addItem(aMarkerGroupCell);
         }
 
-        comboMarkerGroup.setSelectedItem(markerGroup);
+        comboMarkerGroup.setSelectedItem(markerGroupCell);
         comboMarkerGroup.addActionListener(this);
 
         if (isSelected) {
@@ -130,9 +130,12 @@ class MarkerGroupCellEditor extends AbstractCellEditor
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public void actionPerformed(ActionEvent event) {
-        JComboBox<MarkerGroup> comboMarkerGroup = (JComboBox<MarkerGroup>) event.getSource();
-        this.markerGroup = (MarkerGroup) comboMarkerGroup.getSelectedItem();
+        if (event.getSource() instanceof JComboBox) {
+            JComboBox<MarkerGroupCell> comboMarkerGroup = (JComboBox<MarkerGroupCell>) event.getSource();
+            this.markerGroupCell = (MarkerGroupCell) comboMarkerGroup.getSelectedItem();
+        }
     }
 
 }

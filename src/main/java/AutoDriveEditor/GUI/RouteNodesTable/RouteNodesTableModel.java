@@ -136,7 +136,7 @@ public class RouteNodesTableModel extends AbstractTableModel {
             case 4:
                 return node.hasMapMarker() ? node.getMarkerName() : "";
             case 5:
-                return node.hasMapMarker() ? new MarkerGroup(node.getMarkerGroup()) : new MarkerGroup("");
+                return node.hasMapMarker() ? new MarkerGroupCell(node.getMarkerGroup()) : new MarkerGroupCell("");
             case 6:
                 if (node.isParkDestination()) {
                     List<Integer> list = node.getParkedVehiclesList();
@@ -185,7 +185,7 @@ public class RouteNodesTableModel extends AbstractTableModel {
                 node.setMarkerName(newMarkerName);
                 break;
             case 5:
-                String newMarkerGroup = ((MarkerGroup) aValue).getName();
+                String newMarkerGroup = ((MarkerGroupCell) aValue).getName();
                 editMarker(node, node.getMarkerName(), newMarkerGroup); // reuse logic from EditMarkerButton
                 node.setMarkerGroup(newMarkerGroup);
                 break;
@@ -217,7 +217,7 @@ public class RouteNodesTableModel extends AbstractTableModel {
             case 6:
                 return String.class;
             case 5:
-                return MarkerGroup.class;
+                return MarkerGroupCell.class;
             default:
                 return null;
         }
