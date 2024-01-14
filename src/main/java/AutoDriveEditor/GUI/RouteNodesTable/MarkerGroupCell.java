@@ -41,6 +41,7 @@ public class MarkerGroupCell implements Comparable<MarkerGroupCell> {
 
 /*
     custom renderer for cells in the MarkerGroup column.
+    Note: Combobox only shown for editing.
  */
 class MarkerGroupCellRenderer extends DefaultTableCellRenderer {
     private List<MarkerGroupCell> listMarkerGroupCell;
@@ -107,24 +108,23 @@ class MarkerGroupCellEditor extends AbstractCellEditor
     @Override
     public Component getTableCellEditorComponent(JTable table, Object value,
                                                  boolean isSelected, int row, int column) {
+
+        JComboBox<String> comboMarkerGroup = new JComboBox<String>();
+        for (MarkerGroupCell aMarkerGroupCell : listMarkerGroupCell) {
+            comboMarkerGroup.addItem(aMarkerGroupCell.getName());
+        }
+
         if (value instanceof MarkerGroupCell) {
             this.markerGroupCell = (MarkerGroupCell) value;
+            comboMarkerGroup.setSelectedItem(markerGroupCell.getName());
         }
-
-        JComboBox<MarkerGroupCell> comboMarkerGroup = new JComboBox<MarkerGroupCell>();
-
-        for (MarkerGroupCell aMarkerGroupCell : listMarkerGroupCell) {
-            comboMarkerGroup.addItem(aMarkerGroupCell);
-        }
-
-        comboMarkerGroup.setSelectedItem(markerGroupCell);
         comboMarkerGroup.addActionListener(this);
 
-        if (isSelected) {
-            comboMarkerGroup.setBackground(table.getSelectionBackground());
-        } else {
-            comboMarkerGroup.setBackground(table.getSelectionForeground());
-        }
+//        if (isSelected) {
+//            comboMarkerGroup.setBackground(table.getSelectionBackground());
+//        } else {
+//            comboMarkerGroup.setBackground(table.getSelectionForeground());
+//        }
 
         return comboMarkerGroup;
     }
@@ -133,8 +133,11 @@ class MarkerGroupCellEditor extends AbstractCellEditor
     @SuppressWarnings("unchecked")
     public void actionPerformed(ActionEvent event) {
         if (event.getSource() instanceof JComboBox) {
-            JComboBox<MarkerGroupCell> comboMarkerGroup = (JComboBox<MarkerGroupCell>) event.getSource();
-            this.markerGroupCell = (MarkerGroupCell) comboMarkerGroup.getSelectedItem();
+            JComboBox<String> comboMarkerGroup = (JComboBox<String>) event.getSource();
+            this.markerGroupCell = listMarkerGroupCell.stream()
+                    .filter(markerGroupCell -> markerGroupCell.getName().equals( comboMarkerGroup.getSelectedItem() ))
+                    .findFirst()
+                    .orElse(null);
         }
     }
 
