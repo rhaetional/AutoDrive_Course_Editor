@@ -129,12 +129,13 @@ public class RouteNodesTableView extends JPanel implements TableModelListener {
         if ((filterButtonPanel.activeFilter == NodeFilterType.FILTER_MARKERS) ||
                 (filterButtonPanel.activeFilter == NodeFilterType.FILTER_PARKING)) {
             columnOrder[0] = nodesTableModel.getColumnName(0);   // Node ID
-            columnOrder[1] = nodesTableModel.getColumnName(4);   // Marker Name
-            columnOrder[2] = nodesTableModel.getColumnName(5);   // Marker Group
-            columnOrder[3] = nodesTableModel.getColumnName(6);   // Parking Destination
-            columnOrder[4] = nodesTableModel.getColumnName(1);   // X
-            columnOrder[5] = nodesTableModel.getColumnName(2);   // Y
-            columnOrder[6] = nodesTableModel.getColumnName(3);   // Z
+            columnOrder[1] = nodesTableModel.getColumnName(7);   // Priority
+            columnOrder[2] = nodesTableModel.getColumnName(4);   // Marker Name
+            columnOrder[3] = nodesTableModel.getColumnName(5);   // Marker Group
+            columnOrder[4] = nodesTableModel.getColumnName(6);   // Parking Destination
+            columnOrder[5] = nodesTableModel.getColumnName(1);   // X
+            columnOrder[6] = nodesTableModel.getColumnName(2);   // Y
+            columnOrder[7] = nodesTableModel.getColumnName(3);   // Z
 
         } else {
             // order as defined in table model

@@ -15,7 +15,9 @@ import static AutoDriveEditor.AutoDriveEditor.getMapPanel;
 import static AutoDriveEditor.GUI.Buttons.Markers.AddMarkerButton.createMarkerForNode;
 import static AutoDriveEditor.GUI.Buttons.Markers.DeleteMarkerButton.removeMarkerFromNode;
 import static AutoDriveEditor.GUI.Buttons.Markers.EditMarkerButton.editMarker;
+import static AutoDriveEditor.GUI.Buttons.Nodes.SwapNodePriorityButton.changeNodePriority;
 import static AutoDriveEditor.GUI.MapPanel.setStale;
+import static AutoDriveEditor.RoadNetwork.MapNode.NODE_FLAG_REGULAR;
 import static AutoDriveEditor.XMLConfig.AutoSave.resumeAutoSaving;
 import static AutoDriveEditor.XMLConfig.AutoSave.suspendAutoSaving;
 
@@ -31,7 +33,8 @@ public class RouteNodesTableModel extends AbstractTableModel {
             "Z",
             "Marker Name",
             "Marker Group",
-            "Parking Destination"};
+            "Parking Destination",
+            "Prim"};
 //    private final Vector<TableModelListener> listeners = new Vector<>();
 
     @SuppressWarnings("unchecked")
@@ -149,6 +152,8 @@ public class RouteNodesTableModel extends AbstractTableModel {
                     }
                 }
                 return null;
+            case 7:
+                return node.flag == NODE_FLAG_REGULAR;
             default:
                 return null;
         }
@@ -192,6 +197,9 @@ public class RouteNodesTableModel extends AbstractTableModel {
             case 6:
                 // currently not editable
                 node.setParkedVehiclesList(safeCastToLinkedListInteger(aValue));
+                break;
+            case 7:
+                changeNodePriority(node);
                 break;
         }
 
@@ -243,6 +251,8 @@ public class RouteNodesTableModel extends AbstractTableModel {
                 return String.class;
             case 5:
                 return MarkerGroupCell.class;
+            case 7:
+                return Boolean.class;
             default:
                 return null;
         }

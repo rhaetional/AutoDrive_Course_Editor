@@ -68,7 +68,7 @@ public class SwapNodePriorityButton extends BaseButton {
         }
     }
 
-    public void changeNodePriority(MapNode nodeToChange) {
+    public static void changeNodePriority(MapNode nodeToChange) {
         nodeToChange.flag = 1 - nodeToChange.flag;
         changeManager.addChangeable( new NodePriorityChanger(nodeToChange));
         setStale(true);
