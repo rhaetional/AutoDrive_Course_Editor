@@ -31,7 +31,6 @@ public class RouteNodesTableView extends JPanel implements TableModelListener {
         this.nodesTableModel.addTableModelListener(this);
 
         nodesTable = new JTable(nodesTableModel);
-        //nodesTable.setRowHeight(20);
         listMarkerGroup = new ArrayList<>();
         nodesTable.setDefaultRenderer(MarkerGroup.class, new MarkerGroupCellRenderer(listMarkerGroup));
         nodesTable.setDefaultEditor(MarkerGroup.class, new MarkerGroupCellEditor(listMarkerGroup));

@@ -1,6 +1,7 @@
 package AutoDriveEditor.GUI.RouteNodesTable;
 
 import AutoDriveEditor.RoadNetwork.MapNode;
+import AutoDriveEditor.Utils.Classes.CoordinateChanger;
 
 import javax.swing.table.AbstractTableModel;
 import java.util.LinkedList;
@@ -8,6 +9,13 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Vector;
 import java.util.stream.Collectors;
+
+import static AutoDriveEditor.AutoDriveEditor.changeManager;
+import static AutoDriveEditor.AutoDriveEditor.getMapPanel;
+import static AutoDriveEditor.GUI.Buttons.Markers.EditMarkerButton.editMarker;
+import static AutoDriveEditor.GUI.MapPanel.setStale;
+import static AutoDriveEditor.XMLConfig.AutoSave.resumeAutoSaving;
+import static AutoDriveEditor.XMLConfig.AutoSave.suspendAutoSaving;
 
 /**
  * Table Model mapping MapNode to rows
@@ -147,31 +155,52 @@ public class RouteNodesTableModel extends AbstractTableModel {
     @Override
     public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
         MapNode node = data.get(rowIndex);
+        //MapNodeChanger mapNodeChange = new MapNodeChanger();
+
+        suspendAutoSaving();
+
         switch (columnIndex) {
             case 0:
+                // currently not editable
                 node.id = (int) aValue;
                 break;
             case 1:
-                node.x = (double) aValue;
+                double newX = (double) aValue;
+                changeManager.addChangeable(new CoordinateChanger(node, newX, node.y, node.z));
+                node.x = newX;
                 break;
             case 2:
-                node.y = (double) aValue;
+                double newY = (double) aValue;
+                changeManager.addChangeable(new CoordinateChanger(node, node.x, newY, node.z));
+                node.y = newY;
                 break;
             case 3:
-                node.z = (double) aValue;
+                double newZ = (double) aValue;
+                changeManager.addChangeable(new CoordinateChanger(node, node.x, node.y, newZ));
+                node.z = newZ;
                 break;
             case 4:
-                node.setMarkerName((String) aValue);
+                String newMarkerName = (String) aValue;
+                editMarker(node, newMarkerName, node.getMarkerGroup()); // reuse logic from EditMarkerButton
+                node.setMarkerName(newMarkerName);
                 break;
             case 5:
-                node.setMarkerGroup(((MarkerGroup) aValue).getName());
+                String newMarkerGroup = ((MarkerGroup) aValue).getName();
+                editMarker(node, node.getMarkerName(), newMarkerGroup); // reuse logic from EditMarkerButton
+                node.setMarkerGroup(newMarkerGroup);
                 break;
             case 6:
+                // currently not editable
                 node.setParkedVehiclesList(safeCastToLinkedListInteger(aValue));
                 break;
         }
 
+        // update table view
         fireTableRowsUpdated(rowIndex, rowIndex);
+        // update MapPanel model
+        setStale(true);
+        getMapPanel().repaint();
+        resumeAutoSaving();
     }
 
     public Class<?> getColumnClass(int columnIndex) {
