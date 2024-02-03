@@ -918,7 +918,7 @@ public class MapPanel extends JPanel {
 
             x = ((double)heightMapImage.getWidth() / 2) + (int) Math.floor((worldX / mapZoomFactor) / scaleX );
             y = ((double)heightMapImage.getHeight() / 2) + (int) Math.floor((worldZ / mapZoomFactor) / scaleY );
-
+            if (bDebugLogHeightMapInfo) LOG.info("heightmap x y = {} , {}", x, y);
             if (x <0) x = 0;
             if (y <0) y = 0;
             if (x > heightMapImage.getWidth()) x = heightMapImage.getWidth() - 1;
@@ -927,7 +927,9 @@ public class MapPanel extends JPanel {
             Color color = new Color(heightMapImage.getRGB((int)x, (int)y));
             BigDecimal bd = new BigDecimal(Double.toString((float)((color.getRed()<<8) + color.getGreen()) / 256));
             bd = bd.setScale(3, RoundingMode.HALF_UP);
-            return bd.doubleValue() / heightMapScale;
+            if (bDebugLogHeightMapInfo) LOG.info("getYValueFromHeightMap = {}", bd.doubleValue() / heightMapScale);
+            //return bd.doubleValue() / heightMapScale;
+            return bd.doubleValue();
         }
         return -1;
     }
@@ -1343,7 +1345,8 @@ public class MapPanel extends JPanel {
             if (result == JOptionPane.OK_OPTION) {
                 for (MapNode node : RoadMap.networkNodesList) {
                     double heightMapY = getYValueFromHeightMap(node.x, node.z);
-                    if (node.y == -1) {
+                    double delta = Math.abs(node.y - heightMapY);
+                    if (delta > 2.0) {
                         node.y = heightMapY;
                         roadMap.refreshTableNode(node);
                     }
